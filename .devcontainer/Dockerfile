@@ -21,5 +21,3 @@ RUN pip install poetry \
    && poetry config virtualenvs.create false \
    && poetry install \
    && rm -rf /tmp/pip-tmp
-
-ENV PYTHONPATH "${PYTHONPATH}:/workspace"
