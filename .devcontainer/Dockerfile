@@ -13,11 +13,9 @@ RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then groupmod --g
 ARG NODE_VERSION="none"
 RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"; fi
 
-COPY app/pyproject.toml app/poetry.lock /tmp/pip-tmp/
+COPY app/requirements.txt /tmp/pip-tmp/
 
 WORKDIR /tmp/pip-tmp/
 
-RUN pip install poetry \
-   && poetry config virtualenvs.create false \
-   && poetry install \
+RUN pip install -r requirements.txt \
    && rm -rf /tmp/pip-tmp
