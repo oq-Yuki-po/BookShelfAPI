@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, create_engine
+from sqlalchemy import Column, DateTime, MetaData, create_engine
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import sessionmaker
 
@@ -35,5 +35,14 @@ class Base(object):
     def updated_at(cls):
         return Column(DateTime, default=datetime.now, nullable=False)
 
+metadata = MetaData(naming_convention={
+    'pk': 'pk_%(table_name)s',
+    'fk': 'fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s',
+    'ix': 'ix_%(table_name)s_%(column_0_name)s',
+    'uq': 'uq_%(table_name)s_%(column_0_name)s',
+    'ck': 'ck_%(table_name)s_%(constraint_name)s',
+})
+
+BaseModel = declarative_base(cls=Base, metadata=metadata)
 
 BaseModel = declarative_base(cls=Base)
