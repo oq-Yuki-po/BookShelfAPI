@@ -5,6 +5,8 @@ autopep8==1.5.7
 certifi==2021.10.8
 charset-normalizer==2.0.12
 click==8.1.2
+factory-boy==3.2.1
+Faker==13.4.0
 fastapi==0.68.1
 greenlet==1.1.2
 h11==0.13.0
@@ -26,6 +28,7 @@ python-editor==1.0.4
 requests==2.27.1
 six==1.16.0
 SQLAlchemy==1.4.23
+SQLAlchemy-Utils==0.38.2
 starlette==0.14.2
 toml==0.10.2
 typing_extensions==4.1.1
