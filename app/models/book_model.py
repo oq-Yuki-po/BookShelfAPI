@@ -1,3 +1,6 @@
+from datetime import datetime
+from typing import Optional
+
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
@@ -18,11 +21,19 @@ class BookModel(BaseModel):
 
     authors = relationship(AuthorModel, backref="books")
 
-    def __init__(self, title, isbn, cover_path, author_id):
+    def __init__(self,
+                 title: str,
+                 isbn: str,
+                 cover_path: str,
+                 author_id: str,
+                 created_at: Optional[datetime] = None,
+                 updated_at: Optional[datetime] = None) -> None:
         self.title = title
         self.isbn = isbn
         self.cover_path = cover_path
         self.author_id = author_id
+        self.created_at = created_at
+        self.updated_at = updated_at
 
 
 if __name__ == "__main__":
