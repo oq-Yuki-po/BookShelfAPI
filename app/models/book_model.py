@@ -12,7 +12,7 @@ class BookModel(BaseModel):
     __tablename__ = 'books'
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String(256))
-    author_id = Column(Integer, ForeignKey('authors.id'))
+    author_id = Column(Integer, ForeignKey(AuthorModel.id))
     isbn = Column(String(13))
     cover_path = Column(String(256))
 
