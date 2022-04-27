@@ -3,7 +3,7 @@ from datetime import datetime
 
 from sqlalchemy import Column, DateTime, MetaData, create_engine
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 # Engine
 SERVER = os.getenv('POSTGRES_SERVER')
@@ -19,14 +19,19 @@ Engine = create_engine(
 )
 
 # Session
-session = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=Engine
+session = scoped_session(
+    sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        bind=Engine
+    )
 )
 
 
 class Base(object):
+
+    __table_args__ = {'schema': os.environ.get('DB_SCHEMA', None)}
+
     @declared_attr
     def created_at(cls):
         return Column(DateTime, default=datetime.now, nullable=False)
