@@ -38,9 +38,6 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: "3.8"
-      - name: set pythonpath
-        run: |
-          echo "PYTHONPATH=home/runner/work/BookShelfAPI/BookShelfAPI" >> $GITHUB_ENV
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -48,6 +45,7 @@ jobs:
         working-directory: ./app
       - name: DB migration
         run: |
+          echo "PYTHONPATH=home/runner/work/BookShelfAPI" >> $GITHUB_ENV
           alembic upgrade head
         working-directory: ./app
       - name: Test with pytest
