@@ -32,6 +32,7 @@ jobs:
         POSTGRES_PASSWORD: password
         POSTGRES_DB: test
         POSTGRES_PORT: 5432
+        PYTHONPATH: home/runner/work/BookShelfAPI
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.8
