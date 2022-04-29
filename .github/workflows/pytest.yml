@@ -46,7 +46,6 @@ jobs:
       - name: DB migration
         run: |
           alembic upgrade head
-        working-directory: ./app
       - name: Test with pytest
         run: |
           pytest
