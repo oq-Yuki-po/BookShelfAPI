@@ -46,7 +46,9 @@ jobs:
       - name: DB migration
         run: |
           pwd
+          echo ${PYTHONPATH}
           echo "PYTHONPATH=home/runner/work/BookShelfAPI/BookShelfAPI/app" >> $GITHUB_ENV
+          echo ${PYTHONPATH}
           alembic upgrade head
         working-directory: ./app
       - name: Test with pytest
