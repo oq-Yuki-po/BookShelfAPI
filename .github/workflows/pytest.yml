@@ -30,10 +30,11 @@ jobs:
     container:
       image: python:3.8.13
       env:
-        RAILS_ENV: test
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: postgres
         POSTGRES_HOST: postgres
-        RAILS_DATABASE_USER: postgres
-        RAILS_DATABASE_PASSWORD: password
+        POSTGRES_PORT: 5432
     steps:
       - name: checkout
         uses: actions/checkout@v3
