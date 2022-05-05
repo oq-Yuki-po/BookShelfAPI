@@ -15,7 +15,7 @@ PORT = os.getenv('POSTGRES_PORT')
 Engine = create_engine(
     "postgresql://{}:{}@{}:{}/{}".format(USER, PASSWORD, SERVER, PORT, DB),
     encoding="utf-8",
-    echo=False
+    echo=True
 )
 
 # Session
