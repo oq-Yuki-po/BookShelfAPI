@@ -34,3 +34,14 @@ class InvalidUserEmailFormatException(HTTPException):
         self.status_code = status_code
         self.message = message
         super().__init__(status_code=self.status_code, detail=self.message)
+
+
+class UserNotFoundException(HTTPException):
+    """Exception for User Not Found"""
+
+    def __init__(self,
+                 status_code: int = status.HTTP_404_NOT_FOUND,
+                 message: str = ExceptionMessage.USER_NOT_FOUND):
+        self.status_code = status_code
+        self.message = message
+        super().__init__(status_code=self.status_code, detail=self.message)

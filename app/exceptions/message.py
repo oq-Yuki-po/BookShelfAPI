@@ -6,3 +6,4 @@ class ExceptionMessage():
     GOOGLE_BOOKS_API_INVALID_RESPONSE = 'Invalid response received from the API'
     DUPLICATE_USER = 'User already exists'
     INVALID_USER_EMAIL_FORMAT = 'Invalid user email format'
+    USER_NOT_FOUND = 'User not found'
