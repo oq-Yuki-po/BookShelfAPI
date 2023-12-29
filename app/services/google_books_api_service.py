@@ -1,5 +1,6 @@
 import requests
 
+from app.exceptions.exceptions import GoogleBooksApiException
 from app.schemas.api import GoogleBookSchema
 
 
@@ -32,9 +33,10 @@ class GoogleBooksApiService:
             response.raise_for_status()
         except requests.exceptions.HTTPError as http_err:
             print(f'HTTP error occurred: {http_err}')
+            raise GoogleBooksApiException(message="HTTP error occurred")
         except Exception as err:
-            print(f'Other error occurred: {err}')
-
+            print(f'Unexpected error occurred: {err}')
+            raise GoogleBooksApiException(message="Unexpected error occurred")
         try:
             data = response.json()['items'][0]['volumeInfo']
             title = data['title']
@@ -47,5 +49,7 @@ class GoogleBooksApiService:
                                                   published_at=published_at,
                                                   cover_url=cover_url)
             return google_book_schema
-        except (KeyError, TypeError):
+        except (KeyError, TypeError, IndexError):
             print("Invalid response received from the API")
+            print("Response:", response.json())
+            raise GoogleBooksApiException(message="Invalid response received from the API")
