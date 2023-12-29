@@ -235,3 +235,37 @@ class TestUserModel():
         # Assert
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
         assert exc_info.value.message == ExceptionMessage.USER_NOT_FOUND
+
+    def test_fetch_user(self, db_session):
+        """Test fetch_user method of UserModel
+        check if user is found
+        """
+        # Prepare
+        test_user_model = UserModelFactory()
+        db_session.commit()
+
+        # Execute
+        user = UserModel.fetch_user(test_user_model.name, test_user_model.email)
+
+        # Assert
+        assert user is not None
+        assert user.id == test_user_model.id
+        assert user.name == test_user_model.name
+        assert user.email == test_user_model.email
+        assert user.role == test_user_model.role
+
+    def test_fetch_user_user_not_found(self):
+        """Test fetch_user method of UserModel
+        check if user is not found
+        """
+        # Prepare
+        test_user_name = 'test_user_name'
+        test_user_email = 'test_user_email'
+
+        # Execute
+        with pytest.raises(UserNotFoundException) as exc_info:
+            UserModel.fetch_user(test_user_name, test_user_email)
+
+        # Assert
+        assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
+        assert exc_info.value.message == ExceptionMessage.USER_NOT_FOUND

@@ -152,6 +152,34 @@ class UserModel(BaseModel):
             return True
         return False
 
+    @classmethod
+    def fetch_user(cls, name: str, email: str) -> tuple:
+        """Fetch user
+
+        Parameters
+        ----------
+        name : str
+            user name
+        email : str
+            user email
+
+        Returns
+        -------
+        tuple
+            user tuple
+            (id, name, email, role)
+        """
+        stmt = select(UserModel.id,
+                      UserModel.name,
+                      UserModel.email,
+                      UserModel.role
+                      ).where(
+            UserModel.name == name, UserModel.email == email)
+        user = session.execute(stmt).one_or_none()
+        if user is None:
+            raise UserNotFoundException()
+        return user
+
 
 if __name__ == "__main__":
     BaseModel.metadata.create_all(bind=Engine)
