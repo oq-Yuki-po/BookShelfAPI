@@ -24,8 +24,6 @@ class UserModel(BaseModel):
         user email
     password : str
         user password
-    salt : str
-        user salt
     role : str
         user role
         role is one of "user", "admin"
@@ -38,7 +36,6 @@ class UserModel(BaseModel):
     name = Column(String(256), nullable=False)
     email = Column(String(256))
     password = Column(String(256), nullable=False)
-    salt = Column(String(256), nullable=False)
     role = Column(String(256), nullable=False)
 
     def __init__(self,
@@ -49,8 +46,8 @@ class UserModel(BaseModel):
                  created_at: Optional[datetime] = None,
                  updated_at: Optional[datetime] = None) -> None:
 
-        self.salt = bcrypt.gensalt().decode()
-        self.password = self._hash_password(password, self.salt)
+        salt = bcrypt.gensalt().decode()
+        self.password = self._hash_password(password, salt)
         self.name = name
         self.email = self._validate_email(email)
         self.role = role
