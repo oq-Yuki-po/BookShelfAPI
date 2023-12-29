@@ -15,6 +15,7 @@ httpx = "^0.26.0"
 gunicorn = "^21.2.0"
 factory-boy = "^3.3.0"
 requests = "^2.31.0"
+psycopg2-binary = "^2.9.9"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -23,7 +24,15 @@ isort = "^5.13.2"
 autopep8 = "^2.0.4"
 pytest-mock = "^3.12.0"
 pylint = "^3.0.3"
+taskipy = "^1.12.2"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.taskipy.tasks]
+dev = "uvicorn app.main:app --reload"
+test = "pytest -v"
+db_upgrade = "cd app && alembic upgrade head"
+db_downgrade = "cd app && alembic downgrade base"
+db_revision = "cd app && alembic revision --autogenerate -m"

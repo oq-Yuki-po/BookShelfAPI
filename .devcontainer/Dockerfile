@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/devcontainers/python:0-3.11
 
 ENV PYTHONUNBUFFERED 1
 
-COPY app/pyproject.toml /tmp/pip-tmp/
+COPY pyproject.toml /tmp/pip-tmp/
 
 WORKDIR /tmp/pip-tmp/
 
