@@ -1,7 +1,9 @@
 import pytest
+from fastapi import status
 from sqlalchemy import select
 
 from app.exceptions.exceptions import DuplicateUserException, InvalidUserEmailFormatException
+from app.exceptions.message import ExceptionMessage
 from app.models import UserModel
 from app.models.factories import UserModelFactory
 
@@ -57,10 +59,14 @@ class TestUserModel():
         test_user_email = 'sample@sample'
 
         # Execute
-        with pytest.raises(InvalidUserEmailFormatException):
+        with pytest.raises(InvalidUserEmailFormatException) as exc_info:
             UserModel(name=test_user_name,
                       email=test_user_email,
                       password='test_password')
+
+        # Assert
+        assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
+        assert exc_info.value.message == ExceptionMessage.INVALID_USER_EMAIL_FORMAT
 
     def test__hash_password(self):
         """Test _hash_password method of UserModel
@@ -138,8 +144,12 @@ class TestUserModel():
                                password=test_password)
 
         # Execute
-        with pytest.raises(DuplicateUserException):
+        with pytest.raises(DuplicateUserException) as exc_info:
             user_model.save()
+
+        # Assert
+        assert exc_info.value.status_code == status.HTTP_409_CONFLICT
+        assert exc_info.value.message == ExceptionMessage.DUPLICATE_USER
 
     def test_save_is_not_duplicate(self, db_session):
         """Test save method of UserModel

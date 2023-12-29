@@ -1,5 +1,7 @@
 from fastapi import HTTPException, status
 
+from app.exceptions.message import ExceptionMessage
+
 
 class GoogleBooksApiException(HTTPException):
     """Exception for Google Books API"""
@@ -16,8 +18,8 @@ class DuplicateUserException(HTTPException):
     """Exception for User Duplicate"""
 
     def __init__(self,
-                 status_code: int = status.HTTP_400_BAD_REQUEST,
-                 message: str = "Duplicate User Error"):
+                 status_code: int = status.HTTP_409_CONFLICT,
+                 message: str = ExceptionMessage.DUPLICATE_USER):
         self.status_code = status_code
         self.message = message
         super().__init__(status_code=self.status_code, detail=self.message)
@@ -28,7 +30,7 @@ class InvalidUserEmailFormatException(HTTPException):
 
     def __init__(self,
                  status_code: int = status.HTTP_400_BAD_REQUEST,
-                 message: str = "Invalid User Email Format Error"):
+                 message: str = ExceptionMessage.INVALID_USER_EMAIL_FORMAT):
         self.status_code = status_code
         self.message = message
         super().__init__(status_code=self.status_code, detail=self.message)

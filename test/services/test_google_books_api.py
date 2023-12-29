@@ -3,6 +3,7 @@ from fastapi import status
 from requests.exceptions import HTTPError
 
 from app.exceptions.exceptions import GoogleBooksApiException
+from app.exceptions.message import ExceptionMessage
 from app.services.google_books_api_service import GoogleBooksApiService
 
 
@@ -43,7 +44,7 @@ class TestGoogleBooksApiService:
 
         # Assert
         assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-        assert exc_info.value.message == 'Invalid response received from the API'
+        assert exc_info.value.message == ExceptionMessage.GOOGLE_BOOKS_API_INVALID_RESPONSE
 
     def test_get_book_by_isbn_with_http_error(self, mocker):
         """Test for fetch_book_data method of GoogleBooksApiService
@@ -63,7 +64,7 @@ class TestGoogleBooksApiService:
 
         # Assert
         assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-        assert exc_info.value.message == 'HTTP error occurred'
+        assert exc_info.value.message == ExceptionMessage.GOOGLE_BOOKS_API_HTTP_ERROR
 
     def test_get_book_by_isbn_with_unexpected_error(self, mocker):
         """Test for fetch_book_data method of GoogleBooksApiService
@@ -83,4 +84,4 @@ class TestGoogleBooksApiService:
 
         # Assert
         assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-        assert exc_info.value.message == 'Unexpected error occurred'
+        assert exc_info.value.message == ExceptionMessage.GOOGLE_BOOKS_API_UNEXPECTED_ERROR

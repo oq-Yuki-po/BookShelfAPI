@@ -124,7 +124,7 @@ class UserModel(BaseModel):
             if user name and email is duplicate
         """
         if self._is_duplicate(self.name, self.email):
-            raise DuplicateUserException(message="User is duplicate")
+            raise DuplicateUserException()
         session.add(self)
         session.flush()
 
