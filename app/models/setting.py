@@ -1,9 +1,10 @@
 import os
 from datetime import datetime
 from urllib.parse import quote_plus
+
 from sqlalchemy import Column, DateTime, MetaData, create_engine
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import declarative_base, scoped_session, sessionmaker
 
 # Engine
 SERVER = os.getenv('POSTGRES_SERVER')
@@ -35,6 +36,8 @@ class BaseModel(object):
         - updated_at: A datetime object that represents the date and time
         when the object was updated.
     """
+    __table_args__ = {'schema': os.environ.get('DB_SCHEMA', None)}
+
     @declared_attr
     def created_at(cls):
         return Column(DateTime, default=datetime.now, nullable=False)
