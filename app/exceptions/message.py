@@ -8,3 +8,4 @@ class ExceptionMessage():
     INVALID_USER_EMAIL_FORMAT = 'Invalid user email format'
     USER_NOT_FOUND = 'User not found'
     INVALID_USER_PASSWORD = 'Invalid user password'
+    INVALID_CREDENTIALS = 'Invalid credentials'
