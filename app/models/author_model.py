@@ -3,9 +3,9 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, select
 
-from app.models.setting import BaseModel, Engine
+from app.models.setting import BaseModel, Engine, session
 
 
 class AuthorModel(BaseModel):
@@ -21,7 +21,7 @@ class AuthorModel(BaseModel):
     """
     __tablename__ = 'authors'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(256))
+    name = Column(String(256), nullable=False, unique=True)
 
     def __init__(self,
                  name: str,
@@ -31,6 +31,46 @@ class AuthorModel(BaseModel):
         self.name = name
         self.created_at = created_at
         self.updated_at = updated_at
+
+    @classmethod
+    def save(cls, name: str) -> bool:
+        """
+        Save author
+
+        Parameters
+        ----------
+        name : str
+            author name
+
+        Returns
+        -------
+        bool
+            True if saved successfully
+        """
+        author = cls(name=name)
+
+        if author._is_duplicated():
+            return False
+        else:
+            session.add(author)
+            session.flush()
+            return True
+
+    def _is_duplicated(self) -> bool:
+        """
+        Check if author is duplicated
+
+        Returns
+        -------
+        bool
+            True if author is duplicated
+        """
+        stmt = select(AuthorModel).where(AuthorModel.name == self.name)
+        result = session.execute(stmt).scalars().one_or_none()
+        if result is None:
+            return False
+        else:
+            return True
 
 
 if __name__ == "__main__":
