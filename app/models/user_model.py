@@ -6,7 +6,7 @@ from typing import Optional
 import bcrypt
 from sqlalchemy import Column, Integer, String, UniqueConstraint, select
 
-from app.exceptions.exceptions import DuplicateUserException, InvalidUserEmailFormatException
+from app.exceptions.exceptions import DuplicateUserException, InvalidUserEmailFormatException, UserNotFoundException
 from app.models.setting import BaseModel, Engine, session
 
 
@@ -124,6 +124,33 @@ class UserModel(BaseModel):
             raise DuplicateUserException()
         session.add(self)
         session.flush()
+
+    @classmethod
+    def authenticate(cls, name: str, password: str, email: str) -> bool:
+        """Authenticate user
+
+        Parameters
+        ----------
+        name : str
+            user name
+        password : str
+            user password
+        email : str
+            user email
+
+        Returns
+        -------
+        bool
+            True if authentication is successful, False otherwise
+        """
+        stmt = select(UserModel).where(UserModel.name == name, UserModel.email == email)
+        user = session.execute(stmt).scalars().one_or_none()
+        if user is None:
+            raise UserNotFoundException()
+        hashed_password = user.password
+        if bcrypt.checkpw(password.encode(), hashed_password.encode()):
+            return True
+        return False
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@ import pytest
 from fastapi import status
 from sqlalchemy import select
 
-from app.exceptions.exceptions import DuplicateUserException, InvalidUserEmailFormatException
+from app.exceptions.exceptions import DuplicateUserException, InvalidUserEmailFormatException, UserNotFoundException
 from app.exceptions.message import ExceptionMessage
 from app.models import UserModel
 from app.models.factories import UserModelFactory
@@ -179,3 +179,59 @@ class TestUserModel():
         assert user_model.role == 'user'
         assert user_model.created_at is not None
         assert user_model.updated_at is not None
+
+    def test_authenticate_is_valid(self, db_session):
+        """Test authenticate method of UserModel
+        check if user is valid
+        """
+        # Prepare
+        test_user_name = 'test_user_name'
+        test_user_email = 'sample@sample.com'
+        test_password = 'test_password'
+        UserModelFactory(name=test_user_name,
+                         email=test_user_email,
+                         password=test_password)
+        db_session.commit()
+
+        # Execute
+        is_valid = UserModel.authenticate(test_user_name, test_password, test_user_email)
+
+        # Assert
+        assert is_valid is True
+
+    def test_authenticate_is_invalid(self, db_session):
+        """Test authenticate method of UserModel
+        check if user is invalid
+        """
+        # Prepare
+        test_user_name = 'test_user_name'
+        test_user_email = 'sample@sample.com'
+        test_password = 'test_password'
+        invalid_password = 'invalid_password'
+        UserModelFactory(name=test_user_name,
+                         email=test_user_email,
+                         password=test_password)
+        db_session.commit()
+
+        # Execute
+        is_valid = UserModel.authenticate(test_user_name, invalid_password, test_user_email)
+
+        # Assert
+        assert is_valid is False
+
+    def test_authenticate_user_not_found(self):
+        """Test authenticate method of UserModel
+        check if user is not found
+        """
+        # Prepare
+        test_user_name = 'test_user_name'
+        test_user_email = 'test_user_email'
+        test_password = 'test_password'
+
+        # Execute
+        with pytest.raises(UserNotFoundException) as exc_info:
+            UserModel.authenticate(test_user_name, test_password, test_user_email)
+
+        # Assert
+        assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
+        assert exc_info.value.message == ExceptionMessage.USER_NOT_FOUND
