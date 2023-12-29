@@ -21,7 +21,7 @@ class UserSaveIn(BaseModel):
     email: str = Field(title='user email', min_length=1, max_length=255)
     password: str = Field(title='user password', min_length=8, max_length=255)
 
-    class Config:
+    class ConfigDict:
         json_schema_extra = {
             "example": {
                 "name": "user_name",
