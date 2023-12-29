@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Optional
 
 import bcrypt
-from sqlalchemy import Column, Integer, String, UniqueConstraint, select
+from sqlalchemy import Column, Integer, String, select
 
 from app.exceptions.exceptions import DuplicateUserException, InvalidUserEmailFormatException, UserNotFoundException
 from app.models.setting import BaseModel, Engine, session
@@ -30,11 +30,9 @@ class UserModel(BaseModel):
     """
 
     __tablename__ = 'users'
-    __table_args__ = (UniqueConstraint('name', 'email', name='uq_users_name_email'),
-                      {'schema': os.environ.get('DB_SCHEMA', None)})
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(256), nullable=False)
-    email = Column(String(256))
+    email = Column(String(256), nullable=False, unique=True)
     password = Column(String(256), nullable=False)
     role = Column(String(256), nullable=False)
 
@@ -46,8 +44,8 @@ class UserModel(BaseModel):
                  created_at: Optional[datetime] = None,
                  updated_at: Optional[datetime] = None) -> None:
 
-        salt = bcrypt.gensalt().decode()
-        self.password = self._hash_password(password, salt)
+        self.salt = bcrypt.gensalt().decode()
+        self.password = self._hash_password(password, self.salt)
         self.name = name
         self.email = self._validate_email(email)
         self.role = role
@@ -80,13 +78,11 @@ class UserModel(BaseModel):
         """
         return bcrypt.hashpw(password.encode(), salt.encode()).decode()
 
-    def _is_duplicate(self, name: str, email: str) -> bool:
+    def _is_duplicate(self, email: str) -> bool:
         """Check if user is duplicate
 
         Parameters
         ----------
-        name : str
-            user name
         email : str
             user email
 
@@ -95,8 +91,8 @@ class UserModel(BaseModel):
         bool
             True if user is duplicate
         """
-        stmt = select(UserModel).where(UserModel.name == name, UserModel.email == email)
-        result = session.execute(stmt).scalars().one_or_none()
+        stmt = select(UserModel).where(UserModel.email == email)
+        result = session.execute(stmt).one_or_none()
         if result is None:
             return False
         return True
@@ -120,7 +116,7 @@ class UserModel(BaseModel):
         DuplicateUserException
             if user name and email is duplicate
         """
-        if self._is_duplicate(self.name, self.email):
+        if self._is_duplicate(self.email):
             raise DuplicateUserException()
         session.add(self)
         session.flush()

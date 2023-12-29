@@ -25,11 +25,9 @@ class TestUserModel():
                                password=test_password)
 
         # Assert
-        assert user_model.salt is not None
         assert user_model.name == test_user_name
         assert user_model.email == test_user_email
         assert len(user_model.password) == 60
-        assert len(user_model.salt) == 29
         assert user_model.role == 'user'
         assert user_model.created_at is None
         assert user_model.updated_at is None
@@ -103,7 +101,7 @@ class TestUserModel():
                                password='test_password')
 
         # Execute
-        is_duplicate = user_model._is_duplicate(test_user_name, test_user_email)
+        is_duplicate = user_model._is_duplicate(test_user_email)
 
         # Assert
         assert is_duplicate is True
@@ -121,7 +119,7 @@ class TestUserModel():
                                password='test_password')
 
         # Execute
-        is_duplicate = user_model._is_duplicate(test_user_name, test_user_email)
+        is_duplicate = user_model._is_duplicate(test_user_email)
 
         # Assert
         assert is_duplicate is False
