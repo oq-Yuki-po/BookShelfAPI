@@ -1,3 +1,6 @@
+from datetime import datetime
+from typing import Optional
+
 from sqlalchemy import Column, Date, Integer, String
 
 from app.models.setting import BaseModel, Engine
@@ -25,7 +28,13 @@ class BookModel(BaseModel):
     published_at = Column(Date, nullable=False)
     cover_path = Column(String(256))
 
-    def __init__(self, title, isbn, cover_path, published_at, created_at=None, updated_at=None):
+    def __init__(self,
+                 title,
+                 isbn,
+                 cover_path,
+                 published_at,
+                 created_at: Optional[datetime] = None,
+                 updated_at: Optional[datetime] = None) -> None:
         self.title = title
         self.isbn = isbn
         self.cover_path = cover_path
