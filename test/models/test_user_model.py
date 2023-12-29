@@ -192,7 +192,7 @@ class TestUserModel():
         db_session.commit()
 
         # Execute
-        is_valid = UserModel.authenticate(test_user_name, test_password, test_user_email)
+        is_valid = UserModel.authenticate(test_password, test_user_email)
 
         # Assert
         assert is_valid is True
@@ -212,7 +212,7 @@ class TestUserModel():
         db_session.commit()
 
         # Execute
-        is_valid = UserModel.authenticate(test_user_name, invalid_password, test_user_email)
+        is_valid = UserModel.authenticate(invalid_password, test_user_email)
 
         # Assert
         assert is_valid is False
@@ -228,7 +228,7 @@ class TestUserModel():
 
         # Execute
         with pytest.raises(UserNotFoundException) as exc_info:
-            UserModel.authenticate(test_user_name, test_password, test_user_email)
+            UserModel.authenticate(test_password, test_user_email)
 
         # Assert
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
@@ -243,7 +243,7 @@ class TestUserModel():
         db_session.commit()
 
         # Execute
-        user = UserModel.fetch_user(test_user_model.name, test_user_model.email)
+        user = UserModel.fetch_user_by_email(test_user_model.email)
 
         # Assert
         assert user is not None
@@ -262,7 +262,7 @@ class TestUserModel():
 
         # Execute
         with pytest.raises(UserNotFoundException) as exc_info:
-            UserModel.fetch_user(test_user_name, test_user_email)
+            UserModel.fetch_user_by_email(test_user_email)
 
         # Assert
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND

@@ -122,7 +122,7 @@ class UserModel(BaseModel):
         session.flush()
 
     @classmethod
-    def authenticate(cls, name: str, password: str, email: str) -> bool:
+    def authenticate(cls, password: str, email: str) -> bool:
         """Authenticate user
 
         Parameters
@@ -139,7 +139,7 @@ class UserModel(BaseModel):
         bool
             True if authentication is successful, False otherwise
         """
-        stmt = select(UserModel).where(UserModel.name == name, UserModel.email == email)
+        stmt = select(UserModel).where(UserModel.email == email)
         user = session.execute(stmt).scalars().one_or_none()
         if user is None:
             raise UserNotFoundException()
@@ -149,8 +149,8 @@ class UserModel(BaseModel):
         return False
 
     @classmethod
-    def fetch_user(cls, name: str, email: str) -> tuple:
-        """Fetch user
+    def fetch_user_by_email(cls, email: str) -> tuple:
+        """Fetch user by email
 
         Parameters
         ----------
@@ -169,8 +169,7 @@ class UserModel(BaseModel):
                       UserModel.name,
                       UserModel.email,
                       UserModel.role
-                      ).where(
-            UserModel.name == name, UserModel.email == email)
+                      ).where(UserModel.email == email)
         user = session.execute(stmt).one_or_none()
         if user is None:
             raise UserNotFoundException()
