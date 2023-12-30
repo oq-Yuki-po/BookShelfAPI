@@ -9,3 +9,4 @@ class ExceptionMessage():
     USER_NOT_FOUND = 'User not found'
     INVALID_USER_PASSWORD = 'Invalid user password'
     INVALID_CREDENTIALS = 'Invalid credentials'
+    NOT_ENOUGH_PERMISSIONS = 'Not enough permissions'

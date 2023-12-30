@@ -67,3 +67,16 @@ class InvalidCredentialsException(HTTPException):
         self.status_code = status_code
         self.message = message
         super().__init__(status_code=self.status_code, detail=self.message)
+
+# permissions
+
+
+class NotEnoughPermissionsException(HTTPException):
+    """Exception for Not Enough Permissions"""
+
+    def __init__(self,
+                 status_code: int = status.HTTP_403_FORBIDDEN,
+                 message: str = ExceptionMessage.NOT_ENOUGH_PERMISSIONS):
+        self.status_code = status_code
+        self.message = message
+        super().__init__(status_code=self.status_code, detail=self.message)
