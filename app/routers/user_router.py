@@ -36,7 +36,7 @@ async def save_new_user(user_save_in: UserSaveIn) -> UserSaveOut:
     Raises
     ------
     DuplicateUserException
-        if user name and email is duplicate
+        if user email is duplicate
     InvalidUserEmailFormatException
         if user email is invalid
     ```
