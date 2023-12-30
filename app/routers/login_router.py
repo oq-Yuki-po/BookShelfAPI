@@ -4,9 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app import handle_errors
-from app.exceptions.exceptions import InvalidUserPasswordException, NotEnoughPermissionsException
+from app.exceptions.exceptions import InvalidUserPasswordException
 from app.models import UserModel
 from app.routers.setting import AppRoutes
+from app.schemas.exceptions import InvalidUserPasswordExceptionOut, UserNotFoundExceptionOut
 from app.schemas.responses import UserLoginOut
 from app.services.login_service import LoginService
 
@@ -18,6 +19,12 @@ router = APIRouter(
 
 @router.post(AppRoutes.Login.POST_TOKEN_URL,
              response_model=UserLoginOut,
+             responses={
+                 404: {"model": UserNotFoundExceptionOut,
+                       "description": "User Not Found"},
+                 400: {"model": InvalidUserPasswordExceptionOut,
+                       "description": "Invalid Password"}
+             },
              status_code=status.HTTP_200_OK)
 @handle_errors
 async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> UserLoginOut:

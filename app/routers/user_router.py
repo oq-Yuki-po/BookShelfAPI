@@ -4,6 +4,7 @@ from app import handle_errors
 from app.exceptions.exceptions import NotEnoughPermissionsException
 from app.models import UserModel, session
 from app.routers.setting import AppRoutes
+from app.schemas.exceptions import DuplicateUserExceptionOut, InvalidUserEmailFormatExceptionOut
 from app.schemas.requests import UserSaveIn
 from app.schemas.responses import UserSaveOut
 from app.services.login_service import LoginService
@@ -16,6 +17,12 @@ router = APIRouter(
 
 @router.post(AppRoutes.Users.POST_URL,
              response_model=UserSaveOut,
+             responses={
+                 409: {"model": DuplicateUserExceptionOut,
+                       "description": "Duplicate User"},
+                 400: {"model": InvalidUserEmailFormatExceptionOut,
+                       "description": "Invalid Email Format"}
+             },
              status_code=status.HTTP_201_CREATED)
 @handle_errors
 async def save_new_user(user_save_in: UserSaveIn) -> UserSaveOut:

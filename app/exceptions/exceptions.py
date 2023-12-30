@@ -68,8 +68,6 @@ class InvalidCredentialsException(HTTPException):
         self.message = message
         super().__init__(status_code=self.status_code, detail=self.message)
 
-# permissions
-
 
 class NotEnoughPermissionsException(HTTPException):
     """Exception for Not Enough Permissions"""
