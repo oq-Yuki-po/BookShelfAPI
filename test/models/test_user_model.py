@@ -222,7 +222,6 @@ class TestUserModel():
         check if user is not found
         """
         # Prepare
-        test_user_name = 'test_user_name'
         test_user_email = 'test_user_email'
         test_password = 'test_password'
 
@@ -257,7 +256,6 @@ class TestUserModel():
         check if user is not found
         """
         # Prepare
-        test_user_name = 'test_user_name'
         test_user_email = 'test_user_email'
 
         # Execute
