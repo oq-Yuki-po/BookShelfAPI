@@ -1,7 +1,4 @@
-import datetime
-from typing import List
-
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class UserSaveIn(BaseModel):
@@ -21,11 +18,12 @@ class UserSaveIn(BaseModel):
     email: str = Field(title='user email', min_length=1, max_length=255)
     password: str = Field(title='user password', min_length=8, max_length=255)
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "name": "sample user",
                 "email": "sample@sample.com",
                 "password": "password"
             }
         }
+    )
