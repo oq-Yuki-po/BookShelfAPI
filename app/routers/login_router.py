@@ -63,4 +63,4 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> UserLoginOu
     access_token_expires = timedelta(minutes=30)
     access_token = LoginService.create_access_token(data={"sub": user.name, "role": user.role},
                                                     expires_delta=access_token_expires)
-    return UserLoginOut(access_token=access_token, token_type="bearer", role=user.role)
+    return UserLoginOut(access_token=access_token, type="bearer", role=user.role)
