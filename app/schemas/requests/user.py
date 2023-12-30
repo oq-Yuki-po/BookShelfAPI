@@ -24,30 +24,7 @@ class UserSaveIn(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "name": "user_name",
-                "email": "sample@sample.com",
-                "password": "password"
-            }
-        }
-
-
-class UserLoginIn(BaseModel):
-    """
-    UserLoginIn is a class that defines the schema for user login
-
-    Attributes
-    ----------
-    email : str
-        user email
-    password : str
-        user password
-    """
-    email: str = Field(title='user email', min_length=1, max_length=255)
-    password: str = Field(title='user password', min_length=8, max_length=255)
-
-    class Config:
-        json_schema_extra = {
-            "example": {
+                "name": "sample user",
                 "email": "sample@sample.com",
                 "password": "password"
             }
