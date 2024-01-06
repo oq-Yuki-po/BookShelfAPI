@@ -8,6 +8,9 @@ env:
   POSTGRES_SERVER: localhost
   POSTGRES_PORT: 5432
   PYTHONPATH: ${{ github.workspace }}
+  TOKEN_SECRET: secret
+  TOKEN_ALGORITHM: HS256
+  TOKEN_EXPIRE_MINUTES: 30
 jobs:
   test-python:
     runs-on: ubuntu-latest
