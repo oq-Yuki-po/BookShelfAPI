@@ -89,7 +89,7 @@ class TestGoogleBooksApiService:
         assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
         assert exc_info.value.message == ExceptionMessage.GOOGLE_BOOKS_API_UNEXPECTED_ERROR
 
-    def test_save_cover_image(self, change_dir):
+    def test_save_cover_image(self):
         """Test for save_cover_image method of GoogleBooksApiService
         """
 
@@ -105,12 +105,12 @@ class TestGoogleBooksApiService:
         cover_image_path = google_books_api_service.save_cover_image(google_book_schema, isbn)
 
         # Assert
-        assert cover_image_path == 'static/images/9784048930598.jpg'
+        assert cover_image_path == 'app/static/images/9784048930598.jpg'
 
         # Clean up
         os.remove(cover_image_path)
 
-    def test_save_cover_image_with_request_exception(self, change_dir, mocker):
+    def test_save_cover_image_with_request_exception(self, mocker):
         """Test for save_cover_image method of GoogleBooksApiService
         with request exception
         """
@@ -134,7 +134,7 @@ class TestGoogleBooksApiService:
         assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
         assert exc_info.value.message == ExceptionMessage.GOOGLE_BOOKS_API_IMAGE_DOWNLOAD_ERROR
 
-    def test_save_cover_image_with_file_not_found(self, change_dir, mocker):
+    def test_save_cover_image_with_file_not_found(self, mocker):
         """Test for save_cover_image method of GoogleBooksApiService
         with file not found
         """

@@ -81,9 +81,9 @@ class GoogleBooksApiService:
             img = Image.open(BytesIO(res.content))
 
             # save image
-            img.save(f"static/images/{isbn}.jpg")
+            img.save(f"app/static/images/{isbn}.jpg")
 
-            return f"static/images/{isbn}.jpg"
+            return f"app/static/images/{isbn}.jpg"
 
         except requests.exceptions.RequestException as e:
             raise GoogleBooksApiException(message=ExceptionMessage.GOOGLE_BOOKS_API_IMAGE_DOWNLOAD_ERROR) from e
