@@ -29,3 +29,7 @@ class AppRoutePermissions:
     class Users:
         class GetMe:
             PERMISSIONS: list = ["admin", "user"]
+
+    class Books:
+        class PostGoogleBooks:
+            PERMISSIONS: list = ["admin"]
