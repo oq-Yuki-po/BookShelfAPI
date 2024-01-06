@@ -9,7 +9,7 @@ class ImageBase64Service():
 
     @classmethod
     def encode(cls, image_path: str,
-               no_image_path: Union[str, None] = "static/images/no_image.png") -> str:
+               no_image_path: Union[str, None] = "static/images/no_image.png") -> bytes:
         """encode is a function that encodes an image to base64.
 
         Parameters
@@ -22,7 +22,7 @@ class ImageBase64Service():
 
         Returns
         -------
-        str
+        bytes
             Base64 encoded image
         """
         try:
