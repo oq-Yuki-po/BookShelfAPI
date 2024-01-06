@@ -87,7 +87,7 @@ class TestAuthorModel:
         for author in authors:
             assert author.name in test_names
 
-    def test_fetch_by_names_with_non_exist_name(self, db_session):
+    def test_fetch_by_names_with_non_exist_name(self):
         """Test for fetch_by_names method of AuthorModel
         with non-exist name
         """
