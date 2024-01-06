@@ -78,3 +78,14 @@ class NotEnoughPermissionsException(HTTPException):
         self.status_code = status_code
         self.message = message
         super().__init__(status_code=self.status_code, detail=self.message)
+
+
+class BookIsbnInvalidFormatException(HTTPException):
+    """Exception for Book Isbn Invalid Format"""
+
+    def __init__(self,
+                 status_code: int = status.HTTP_400_BAD_REQUEST,
+                 message: str = "Invalid Isbn Format"):
+        self.status_code = status_code
+        self.message = message
+        super().__init__(status_code=self.status_code, detail=self.message)
