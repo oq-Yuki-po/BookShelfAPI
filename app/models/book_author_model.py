@@ -1,7 +1,7 @@
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
-from app.models import AuthorModel, BookModel
+from app.models import AuthorModel, BookModel, session
 from app.models.setting import BaseModel, Engine
 
 
@@ -38,6 +38,27 @@ class BookAuthorModel(BaseModel):
             self.author = author
         self.created_at = created_at
         self.updated_at = updated_at
+
+    @classmethod
+    def save(cls, book_id, author_id):
+        """
+        Save book author
+
+        Parameters
+        ----------
+        book_id : int
+            book id
+        author_id : int
+            author id
+
+        Returns
+        -------
+        bool
+            True if saved successfully
+        """
+        book_author = cls(book_id=book_id, author_id=author_id)
+        session.add(book_author)
+        session.flush()
 
 
 if __name__ == "__main__":
