@@ -3,7 +3,7 @@ import pytest
 from app.exceptions.exceptions import BookIsbnInvalidFormatException
 from app.exceptions.message import ExceptionMessage
 from app.schemas.requests import BooksGoogleBooksApiSaveIn
-from app.schemas.requests.books import isbn10_to_isbn13
+from app.schemas.requests.book import isbn10_to_isbn13
 
 
 def test_isbn10_to_isbn13():
