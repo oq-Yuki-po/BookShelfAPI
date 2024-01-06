@@ -1,3 +1,4 @@
+import traceback
 from functools import wraps
 from logging import getLogger
 
@@ -18,9 +19,12 @@ def handle_errors(func):
         try:
             return await func(*args, **kwargs)
         except HTTPException as exc:
+            app_logger.error(exc)
+            app_logger.error(traceback.format_exc())
             raise exc
         except Exception as exc:
             app_logger.error(exc)
+            app_logger.error(traceback.format_exc())
             raise HTTPException(detail=ExceptionMessage.INTERNAL_SERVER_ERROR, status_code=500) from exc
         finally:
             session.close()
