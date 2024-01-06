@@ -32,7 +32,7 @@ class GoogleBookSchema(BaseModel):
     def cover_url_is_empty(cls, v):
         """If cover_url is empty, replace it with a placeholder image"""
         if not v:
-            return 'https://via.placeholder.com/150'
+            return 'app/static/images/no_image.jpg'
         return v
 
     @field_validator('published_at')

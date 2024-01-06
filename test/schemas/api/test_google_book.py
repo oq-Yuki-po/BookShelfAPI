@@ -15,7 +15,7 @@ class TestGoogleBookSchema():
         )
 
         # Assert
-        assert google_book_schema.cover_url == 'https://via.placeholder.com/150'
+        assert google_book_schema.cover_url == 'app/static/images/no_image.jpg'
 
     def test_published_at_is_empty(self):
         """If published_at is empty, replace it with 1970-01-01
