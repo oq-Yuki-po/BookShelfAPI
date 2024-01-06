@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
@@ -7,8 +8,8 @@ from jose import JWTError, jwt
 from app.exceptions.exceptions import InvalidCredentialsException
 from app.routers.setting import oauth2_scheme
 
-SECRET_KEY = "YOUR_SECRET_KEY"
-ALGORITHM = "HS256"
+SECRET_KEY = os.environ.get("TOKEN_SECRET")
+ALGORITHM = os.environ.get("TOKEN_ALGORITHM")
 
 
 @dataclass
@@ -30,7 +31,7 @@ class TokenData:
 class LoginService:
 
     @classmethod
-    def create_access_token(cls, data: dict, expires_delta: timedelta = None) -> str:
+    def create_access_token(cls, data: dict) -> str:
         """Create access token
 
         Parameters
@@ -46,10 +47,7 @@ class LoginService:
             access token
         """
         to_encode = data.copy()
-        if expires_delta:
-            expire = datetime.utcnow() + expires_delta
-        else:
-            expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.utcnow() + timedelta(minutes=int(os.environ.get("TOKEN_EXPIRE_MINUTES")))
         to_encode.update({"exp": expire})
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt

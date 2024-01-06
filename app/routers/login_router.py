@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app import handle_errors
@@ -60,7 +60,5 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> UserLoginOu
     user = UserModel.fetch_user_by_email(form_data.username)
 
     # generate token
-    access_token_expires = timedelta(minutes=30)
-    access_token = LoginService.create_access_token(data={"sub": user.name, "role": user.role},
-                                                    expires_delta=access_token_expires)
+    access_token = LoginService.create_access_token(data={"sub": user.name, "role": user.role})
     return UserLoginOut(access_token=access_token, type="bearer", role=user.role)
