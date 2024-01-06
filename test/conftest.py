@@ -1,4 +1,5 @@
 import os
+from contextlib import contextmanager
 
 import pytest
 from fastapi.testclient import TestClient
@@ -9,6 +10,7 @@ from sqlalchemy_utils.functions.database import create_database
 
 from app.main import app
 from app.models import BaseModel, Engine, session
+from app.services.login_service import LoginService, TokenData
 
 
 def remove_session() -> None:
@@ -110,3 +112,25 @@ def change_dir():
     os.chdir(os.path.join(cwd, 'app'))
     yield
     os.chdir(cwd)
+
+
+@contextmanager
+def create_user_mock(role: str):
+    """create_user_mock
+    """
+    original_overrides = app.dependency_overrides.copy()
+    app.dependency_overrides[LoginService.verify_token] = lambda: TokenData(user_name="test_user", role=role)
+    try:
+        yield
+    finally:
+        app.dependency_overrides = original_overrides
+
+
+@pytest.fixture()
+def override_verify_token_dependency():
+    """override_verify_token_dependency
+    """
+    def _override(role: str):
+        return create_user_mock(role)
+
+    return _override
