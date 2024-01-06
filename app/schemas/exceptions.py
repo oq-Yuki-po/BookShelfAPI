@@ -91,3 +91,18 @@ class NotEnoughPermissionsExceptionOut(BaseModel):
             }
         }
     )
+
+
+class DuplicateBookISBNExceptionOut(BaseModel):
+
+    detail: str = Field(
+        description='The detail of the exception',
+        default=ExceptionMessage.DUPLICATE_BOOK_ISBN
+    )
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'detail': ExceptionMessage.DUPLICATE_BOOK_ISBN
+            }
+        }
+    )

@@ -89,3 +89,14 @@ class BookIsbnInvalidFormatException(HTTPException):
         self.status_code = status_code
         self.message = message
         super().__init__(status_code=self.status_code, detail=self.message)
+
+
+class DuplicateBookIsbnException(HTTPException):
+    """Exception for Book Isbn Duplicate"""
+
+    def __init__(self,
+                 status_code: int = status.HTTP_409_CONFLICT,
+                 message: str = ExceptionMessage.DUPLICATE_BOOK_ISBN):
+        self.status_code = status_code
+        self.message = message
+        super().__init__(status_code=self.status_code, detail=self.message)
