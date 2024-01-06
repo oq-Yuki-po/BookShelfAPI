@@ -19,6 +19,7 @@ class AppRoutes:
         TAG: str = "books"
         PREFIX: str = "/books"
         POST_URL: str = "/"
+        POST_GOOGLE_BOOKS_URL: str = "/google-books"
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=AppRoutes.Login.PREFIX + AppRoutes.Login.POST_TOKEN_URL)
