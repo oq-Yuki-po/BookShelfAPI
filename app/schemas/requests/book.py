@@ -42,14 +42,7 @@ class BooksGoogleBooksApiSaveIn(BaseModel):
     Attributes
     ----------
     isbn : str
-        isbn number
-
-    Raises
-    ------
-    ValueError
-        _description_
-    ValueError
-        _description_
+        isbn number of book which is 10 or 13 digits
     """
 
     isbn: str = Field(title='isbn', min_length=1, max_length=20)

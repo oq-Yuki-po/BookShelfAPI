@@ -3,6 +3,12 @@ from fastapi import APIRouter, Depends
 from app.exceptions.exceptions import NotEnoughPermissionsException
 from app.models import AuthorModel, BookAuthorModel, BookModel, session
 from app.routers.setting import AppRoutePermissions, AppRoutes
+from app.schemas.exceptions import (
+    BookIsbnInvalidFormatExceptionOut,
+    DuplicateBookISBNExceptionOut,
+    GoogleBooksApiExceptionOut,
+    NotEnoughPermissionsExceptionOut,
+)
 from app.schemas.requests import BooksGoogleBooksApiSaveIn
 from app.schemas.responses import GoogleBooksApiSaveOut
 from app.services.google_books_api_service import GoogleBooksApiService
@@ -19,9 +25,46 @@ BOOK_ROUTER_PERMISSIONS = AppRoutePermissions.Books
 
 @router.post(BOOK_ROUTERS.POST_GOOGLE_BOOKS_URL,
              response_model=GoogleBooksApiSaveOut,
+             responses={
+                 400: {"model": BookIsbnInvalidFormatExceptionOut,
+                       "description": "Book ISBN Invalid Format"},
+                 403: {"model": NotEnoughPermissionsExceptionOut,
+                       "description": "Not Enough Permissions"},
+                 409: {"model": DuplicateBookISBNExceptionOut,
+                       "description": "Duplicate Book ISBN"},
+                 500: {"model": GoogleBooksApiExceptionOut,
+                       "description": "Google Books API Error"},
+
+             },
              status_code=200)
 async def save_google_books(books_google_books_api_save_in: BooksGoogleBooksApiSaveIn,
                             current_user: TokenData = Depends(LoginService.verify_token)) -> GoogleBooksApiSaveOut:
+    """
+    Save book from Google Books API
+
+    ```
+    Parameters
+    ----------
+    books_google_books_api_save_in: BooksGoogleBooksApiSaveIn
+        BooksGoogleBooksApiSaveIn schema
+    current_user: TokenData
+        TokenData schema
+
+    Returns
+    -------
+    GoogleBooksApiSaveOut
+        GoogleBooksApiSaveOut schema
+
+    Raises
+    ------
+    NotEnoughPermissionsException
+        if user does not have enough permissions
+    DuplicateBookISBNException
+        if book isbn already exists
+    GoogleBooksApiException
+        if google books api error occurred
+    ```
+    """
 
     # check user permissions
     if current_user.role not in BOOK_ROUTER_PERMISSIONS.PostGoogleBooks.PERMISSIONS:

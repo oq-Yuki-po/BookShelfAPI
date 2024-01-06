@@ -106,3 +106,33 @@ class DuplicateBookISBNExceptionOut(BaseModel):
             }
         }
     )
+
+
+class BookIsbnInvalidFormatExceptionOut(BaseModel):
+
+    detail: str = Field(
+        description='The detail of the exception',
+        default=ExceptionMessage.BOOK_ISBN_FORMAT
+    )
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'detail': ExceptionMessage.BOOK_ISBN_FORMAT
+            }
+        }
+    )
+
+
+class GoogleBooksApiExceptionOut(BaseModel):
+
+    detail: str = Field(
+        description='The detail of the exception',
+        default=ExceptionMessage.GOOGLE_BOOKS_API_HTTP_ERROR
+    )
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'detail': ExceptionMessage.GOOGLE_BOOKS_API_HTTP_ERROR
+            }
+        }
+    )
