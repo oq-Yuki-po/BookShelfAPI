@@ -21,7 +21,7 @@ USER_ROUTER = AppRoutes.Users
 USER_ROUTER_PERMISSIONS = AppRoutePermissions.Users
 
 
-@router.post(USER_ROUTER.POST_TOKEN_URL,
+@router.post(USER_ROUTER.POST_URL,
              response_model=UserSaveOut,
              responses={
                  409: {"model": DuplicateUserExceptionOut,
