@@ -1,9 +1,12 @@
+import os
+
 import pytest
 from fastapi import status
-from requests.exceptions import HTTPError
+from requests.exceptions import HTTPError, RequestException
 
 from app.exceptions.exceptions import GoogleBooksApiException
 from app.exceptions.message import ExceptionMessage
+from app.schemas.api import GoogleBookSchema
 from app.services.google_books_api_service import GoogleBooksApiService
 
 
@@ -85,3 +88,72 @@ class TestGoogleBooksApiService:
         # Assert
         assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
         assert exc_info.value.message == ExceptionMessage.GOOGLE_BOOKS_API_UNEXPECTED_ERROR
+
+    def test_save_cover_image(self, change_dir):
+        """Test for save_cover_image method of GoogleBooksApiService
+        """
+
+        # Prepare
+        isbn = '9784048930598'
+        google_book_schema = GoogleBookSchema(title='Clean Code',
+                                              authors=['ロバート・C. マーチン'],
+                                              published_at='2017-12-01',
+                                              cover_url='http://books.google.com/books/content?id=bk4atAEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api')
+
+        # Execute
+        google_books_api_service = GoogleBooksApiService()
+        cover_image_path = google_books_api_service.save_cover_image(google_book_schema, isbn)
+
+        # Assert
+        assert cover_image_path == 'static/images/9784048930598.jpg'
+
+        # Clean up
+        os.remove(cover_image_path)
+
+    def test_save_cover_image_with_request_exception(self, change_dir, mocker):
+        """Test for save_cover_image method of GoogleBooksApiService
+        with request exception
+        """
+
+        # Prepare
+        isbn = '9784048930598'
+        google_book_schema = GoogleBookSchema(title='Clean Code',
+                                              authors=['ロバート・C. マーチン'],
+                                              published_at='2017-12-01',
+                                              cover_url='')
+        mocker.patch('app.services.google_books_api_service.requests.get')
+        requests_get_mock = mocker.patch('app.services.google_books_api_service.requests.get')
+        requests_get_mock.side_effect = RequestException()
+
+        # Execute
+        google_books_api_service = GoogleBooksApiService()
+        with pytest.raises(GoogleBooksApiException) as exc_info:
+            _ = google_books_api_service.save_cover_image(google_book_schema, isbn)
+
+        # Assert
+        assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert exc_info.value.message == ExceptionMessage.GOOGLE_BOOKS_API_IMAGE_DOWNLOAD_ERROR
+
+    def test_save_cover_image_with_file_not_found(self, change_dir, mocker):
+        """Test for save_cover_image method of GoogleBooksApiService
+        with file not found
+        """
+
+        # Prepare
+        isbn = '9784048930598'
+        google_book_schema = GoogleBookSchema(title='Clean Code',
+                                              authors=['ロバート・C. マーチン'],
+                                              published_at='2017-12-01',
+                                              cover_url='')
+        mocker.patch('app.services.google_books_api_service.requests.get')
+        requests_get_mock = mocker.patch('app.services.google_books_api_service.requests.get')
+        requests_get_mock.return_value.content = b'sfas'
+
+        # Execute
+        google_books_api_service = GoogleBooksApiService()
+        with pytest.raises(GoogleBooksApiException) as exc_info:
+            _ = google_books_api_service.save_cover_image(google_book_schema, isbn)
+
+        # Assert
+        assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert exc_info.value.message == ExceptionMessage.GOOGLE_BOOKS_API_IMAGE_DOWNLOAD_ERROR

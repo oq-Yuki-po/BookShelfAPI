@@ -1,4 +1,7 @@
+from io import BytesIO
+
 import requests
+from PIL import Image
 
 from app.exceptions.exceptions import GoogleBooksApiException
 from app.exceptions.message import ExceptionMessage
@@ -54,3 +57,37 @@ class GoogleBooksApiService:
             print("Invalid response received from the API")
             print("Response:", response.json())
             raise GoogleBooksApiException(message=ExceptionMessage.GOOGLE_BOOKS_API_INVALID_RESPONSE) from err
+
+    @classmethod
+    def save_cover_image(cls, google_book_schema: GoogleBookSchema, isbn: str):
+        """Get cover image of book from Google Books API
+
+        Parameters
+        ----------
+        google_book_schema : GoogleBookSchema
+            Schema of google book data
+        isbn : str
+            ISBN of book
+        Returns
+        -------
+        cover_image : PIL.Image
+            Cover image of book
+        """
+        try:
+            res = requests.get(google_book_schema.cover_url, timeout=10)
+            res.raise_for_status()
+
+            # check if image is valid
+            img = Image.open(BytesIO(res.content))
+
+            # save image
+            img.save(f"static/images/{isbn}.jpg")
+
+            return f"static/images/{isbn}.jpg"
+
+        except requests.exceptions.RequestException as e:
+            raise GoogleBooksApiException(message=ExceptionMessage.GOOGLE_BOOKS_API_IMAGE_DOWNLOAD_ERROR) from e
+        except IOError as e:
+            raise GoogleBooksApiException(message=ExceptionMessage.GOOGLE_BOOKS_API_IMAGE_DOWNLOAD_ERROR) from e
+        except Exception as e:
+            raise GoogleBooksApiException(message=ExceptionMessage.GOOGLE_BOOKS_API_IMAGE_DOWNLOAD_ERROR) from e

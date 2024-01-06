@@ -100,3 +100,13 @@ def make_image(tmpdir):
         image.save(image_path)
         return image_path
     return _make_image
+
+
+@pytest.fixture()
+def change_dir():
+    """change directory to app root
+    """
+    cwd = os.getcwd()
+    os.chdir(os.path.join(cwd, 'app'))
+    yield
+    os.chdir(cwd)
