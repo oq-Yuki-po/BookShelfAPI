@@ -29,3 +29,18 @@ class UserLoginOut(BaseModel):
             }
         }
     )
+
+
+class UserGetMeOut(BaseModel):
+
+    user_name: str = Field(title='user name', min_length=1, max_length=255)
+    role: str = Field(title='role', min_length=1, max_length=255, default='user')
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'user_name': 'user name',
+                'role': 'user'
+            }
+        }
+    )

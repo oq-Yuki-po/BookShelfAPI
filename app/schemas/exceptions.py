@@ -76,3 +76,18 @@ class InvalidCredentialsExceptionOut(BaseModel):
             }
         }
     )
+
+
+class NotEnoughPermissionsExceptionOut(BaseModel):
+
+    detail: str = Field(
+        description='The detail of the exception',
+        default=ExceptionMessage.NOT_ENOUGH_PERMISSIONS
+    )
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'detail': ExceptionMessage.NOT_ENOUGH_PERMISSIONS
+            }
+        }
+    )

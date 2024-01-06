@@ -1,2 +1,2 @@
 # isort:skip_file
-from app.schemas.responses.user import UserSaveOut, UserLoginOut
+from app.schemas.responses.user import UserSaveOut, UserLoginOut, UserGetMeOut
