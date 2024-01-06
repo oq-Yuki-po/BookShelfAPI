@@ -1,3 +1,4 @@
+import base64
 import os
 from contextlib import contextmanager
 
@@ -134,3 +135,16 @@ def override_verify_token_dependency():
         return create_user_mock(role)
 
     return _override
+
+
+@pytest.fixture()
+def encode_image_base64():
+    """encode_image_base64
+    image_path -> base64 encoded image
+    """
+    def _encode(image_path: str):
+        with open(image_path, 'rb') as f:
+            img = f.read()
+        return base64.b64encode(img)
+
+    return _encode
