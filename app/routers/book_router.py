@@ -33,8 +33,7 @@ BOOK_ROUTER_PERMISSIONS = AppRoutePermissions.Books
                  409: {"model": DuplicateBookISBNExceptionOut,
                        "description": "Duplicate Book ISBN"},
                  500: {"model": GoogleBooksApiExceptionOut,
-                       "description": "Google Books API Error"},
-
+                       "description": "Google Books API Error"}
              },
              status_code=200)
 async def save_google_books(books_google_books_api_save_in: BooksGoogleBooksApiSaveIn,
