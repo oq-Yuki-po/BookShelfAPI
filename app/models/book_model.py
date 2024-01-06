@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Column, Date, Integer, String
+from sqlalchemy import Column, Date, Integer, String, select
 
-from app.models.setting import BaseModel, Engine
+from app.exceptions.exceptions import DuplicateBookIsbnException
+from app.models.setting import BaseModel, Engine, session
 
 
 class BookModel(BaseModel):
@@ -41,6 +44,42 @@ class BookModel(BaseModel):
         self.published_at = published_at
         self.created_at = created_at
         self.updated_at = updated_at
+
+    def _is_duplicated(self) -> bool:
+        """
+        Check if book's isbn is duplicated
+
+        Returns
+        -------
+        bool
+            True if book's isbn is duplicated
+        """
+        stmt = select(BookModel).where(BookModel.isbn == self.isbn)
+        result = session.execute(stmt).scalars().one_or_none()
+        if result is None:
+            return False
+        else:
+            return True
+
+    def save_google_books_api(self) -> BookModel:
+        """Save book from Google Books API
+
+        Returns
+        -------
+        BookModel
+            BookModel object
+
+        Raises
+        ------
+        DuplicateBookIsbnException
+            If book's isbn is duplicated
+        """
+        if self._is_duplicated():
+            raise DuplicateBookIsbnException()
+        else:
+            session.add(self)
+            session.flush()
+            return self
 
 
 if __name__ == "__main__":
