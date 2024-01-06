@@ -57,6 +57,8 @@ async def save_google_books(books_google_books_api_save_in: BooksGoogleBooksApiS
 
     Raises
     ------
+    BookIsbnInvalidFormatException
+        if book isbn format is invalid
     NotEnoughPermissionsException
         if user does not have enough permissions
     DuplicateBookISBNException
