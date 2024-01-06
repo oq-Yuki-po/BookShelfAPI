@@ -1,7 +1,7 @@
 from sqlalchemy import select
 
 from app.models import BookAuthorModel
-from app.models.factories import AuthorModelFactory, BookAuthorModelFactory, BookModelFactory
+from app.models.factories import AuthorModelFactory, BookModelFactory
 
 
 class TestBookAuthorModel:
