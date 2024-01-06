@@ -69,3 +69,33 @@ class TestAuthorModel:
         result = db_session.execute(stmt).scalars().first()
         assert result is not None
         assert result.name == test_name
+
+    def test_fetch_by_names(self, db_session):
+        """Test for fetch_by_names method of AuthorModel"""
+        # Prepare
+        test_names = ['test_name1', 'test_name2']
+        for name in test_names:
+            AuthorModelFactory(name=name)
+        db_session.commit()
+
+        # Execute
+        authors = AuthorModel.fetch_by_names(names=test_names)
+
+        # Assert
+        assert authors is not None
+        assert len(authors) == len(test_names)
+        for author in authors:
+            assert author.name in test_names
+
+    def test_fetch_by_names_with_non_exist_name(self, db_session):
+        """Test for fetch_by_names method of AuthorModel
+        with non-exist name
+        """
+        # Prepare
+
+        # Execute
+        authors = AuthorModel.fetch_by_names(names=['test_name3'])
+
+        # Assert
+        assert authors is not None
+        assert not len(authors)

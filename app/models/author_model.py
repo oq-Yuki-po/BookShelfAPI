@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy import Column, Integer, String, select
 
@@ -71,6 +71,25 @@ class AuthorModel(BaseModel):
             return False
         else:
             return True
+
+    @classmethod
+    def fetch_by_names(cls, names: List[str]) -> AuthorModel:
+        """
+        Fetch author by name
+
+        Parameters
+        ----------
+        name : str
+            author name
+
+        Returns
+        -------
+        AuthorModel
+            AuthorModel object
+        """
+        stmt = select(AuthorModel).where(AuthorModel.name.in_(names))
+        result = session.execute(stmt).scalars().all()
+        return result
 
 
 if __name__ == "__main__":
