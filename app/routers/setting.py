@@ -17,3 +17,9 @@ class AppRoutes:
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=AppRoutes.Login.PREFIX + AppRoutes.Login.POST_TOKEN_URL)
+
+
+class AppRoutePermissions:
+    class Users:
+        class GetMe:
+            PERMISSIONS: list = ["admin", "user"]
