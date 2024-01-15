@@ -121,7 +121,6 @@ def test_verify_user_invalid_token(app_client: TestClient, db_session: Session):
 
     # Execute
     response = app_client.get(f"{TEST_URL}/token/invalid_token")
-    db_session.close()
 
     # Assert
     assert response.status_code == status.HTTP_404_NOT_FOUND
