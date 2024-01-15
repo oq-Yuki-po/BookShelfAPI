@@ -4,7 +4,7 @@ class AppRoutes:
         TAG: str = "users"
         PREFIX: str = "/users"
         POST_URL: str = "/"
-        POST_TOKEN_URL: str = "/token"
+        POST_TOKEN_URL: str = "/token/{token}"
         GET_ME_URL: str = "/me"
 
     class Login:
