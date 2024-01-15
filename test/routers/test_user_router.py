@@ -17,7 +17,7 @@ from app.schemas.responses import UserSaveOut, UserVerifyOut
 TEST_URL = f"{AppRoutes.Users.PREFIX}"
 
 
-def test_save_new_user_success(app_client: TestClient, db_session: Session):
+def test_save_new_user_success(app_client: TestClient, db_session: Session, mocker):
     """
     Test save new user
     """
@@ -27,6 +27,7 @@ def test_save_new_user_success(app_client: TestClient, db_session: Session):
     test_user_password = "password"
     user_save_in = UserSaveIn(name=test_user_name, email=test_user_email, password=test_user_password)
 
+    _ = mocker.patch("smtplib.SMTP")
     # Execute
     response = app_client.post(f"{TEST_URL}{AppRoutes.Users.POST_URL}",
                                json=user_save_in.model_dump())
