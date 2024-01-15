@@ -6,9 +6,13 @@ from sqlalchemy.orm import Session
 from app.models import UserModel
 from app.models.factories import UserModelFactory
 from app.routers.setting import AppRoutes
-from app.schemas.exceptions import DuplicateUserExceptionOut, InvalidUserEmailFormatExceptionOut
+from app.schemas.exceptions import (
+    DuplicateUserExceptionOut,
+    InvalidUserEmailFormatExceptionOut,
+    VerificationTokenNotFoundExceptionOut,
+)
 from app.schemas.requests import UserSaveIn
-from app.schemas.responses import UserSaveOut
+from app.schemas.responses import UserSaveOut, UserVerifyOut
 
 TEST_URL = f"{AppRoutes.Users.PREFIX}"
 
@@ -81,3 +85,49 @@ def test_save_new_user_invalid_email(app_client: TestClient):
     # Assert
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json() == InvalidUserEmailFormatExceptionOut().model_dump()
+
+
+def test_verify_user_success(app_client: TestClient, db_session: Session):
+    """
+    Test verify user
+    """
+    # Prepare
+    user_model = UserModelFactory(is_verified=False)
+    db_session.commit()
+    user_id = user_model.id
+
+    # Execute
+    response = app_client.get(f"{TEST_URL}/token/{user_model.verification_token}")
+    db_session.close()
+
+    # Assert
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == UserVerifyOut().model_dump()
+    # Check database
+    stmt = select(UserModel).where(UserModel.id == user_id)
+    user_model = db_session.execute(stmt).scalars().one_or_none()
+    assert user_model.is_verified is True
+    assert user_model.verification_token is None
+
+
+def test_verify_user_invalid_token(app_client: TestClient, db_session: Session):
+    """
+    Test verify user with invalid token
+    """
+    # Prepare
+    user_model = UserModelFactory(is_verified=False)
+    db_session.commit()
+    user_id = user_model.id
+
+    # Execute
+    response = app_client.get(f"{TEST_URL}/token/invalid_token")
+    db_session.close()
+
+    # Assert
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json() == VerificationTokenNotFoundExceptionOut().model_dump()
+    # Check database
+    stmt = select(UserModel).where(UserModel.id == user_id)
+    user_model = db_session.execute(stmt).scalars().one_or_none()
+    assert user_model.is_verified is False
+    assert user_model.verification_token is not None

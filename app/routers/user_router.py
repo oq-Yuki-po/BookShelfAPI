@@ -1,17 +1,19 @@
 from fastapi import APIRouter, Depends, status
 
 from app import handle_errors
-from app.exceptions.exceptions import NotEnoughPermissionsException
+from app.exceptions.exceptions import NotEnoughPermissionsException, VerificationTokenNotFoundException
 from app.models import UserModel, session
 from app.routers.setting import AppRoutePermissions, AppRoutes
 from app.schemas.exceptions import (
     DuplicateUserExceptionOut,
     InvalidUserEmailFormatExceptionOut,
     NotEnoughPermissionsExceptionOut,
+    VerificationTokenNotFoundExceptionOut,
 )
 from app.schemas.requests import UserSaveIn
-from app.schemas.responses import UserGetMeOut, UserSaveOut
+from app.schemas.responses import UserGetMeOut, UserSaveOut, UserVerifyOut
 from app.services.login_service import LoginService
+from app.services.mail_service import MailService
 
 router = APIRouter(
     prefix=AppRoutes.Users.PREFIX,
@@ -58,8 +60,22 @@ async def save_new_user(user_save_in: UserSaveIn) -> UserSaveOut:
                            password=user_save_in.password,
                            email=user_save_in.email)
     user_model.save()
-    session.commit()
 
+    verification_token = user_model.verification_token
+
+    # send email
+    mail_service = MailService()
+
+    # send email to user
+    mail_service.send_email(receiver_email=user_model.email,
+                            subject="Welcome to Book Shelf App",
+                            body=f"Hi {user_model.name},\n\n"
+                                 f"Welcome to Book Shelf App.\n\n"
+                                 f"Please click the link below to verify your account.\n\n"
+                                 f"http://localhost:8000/users/token/{verification_token}"
+                            )
+
+    session.commit()
     return UserSaveOut()
 
 
@@ -95,3 +111,44 @@ async def get_current_user(current_user: str = Depends(LoginService.verify_token
     if current_user.role not in USER_ROUTER_PERMISSIONS.GetMe.PERMISSIONS:
         raise NotEnoughPermissionsException()
     return UserGetMeOut(user_name=current_user.user_name, role=current_user.role)
+
+
+@router.get(USER_ROUTER.GET_TOKEN_URL,
+            response_model=UserVerifyOut,
+            responses={
+                404: {"model": VerificationTokenNotFoundExceptionOut,
+                      "description": "Verification Token Not Found"}
+            },
+            status_code=status.HTTP_200_OK)
+@handle_errors
+async def verify_user(token: str):
+    """
+    Verify user
+
+    ```
+    Parameters
+    ----------
+    token: str
+        verification token
+
+    Returns
+    -------
+    UserVerifyOut
+        UserVerifyOut schema
+
+    Raises
+    ------
+    VerificationTokenNotFoundException
+        if verification token not found
+    ```
+    """
+    if UserModel.exist_verification_token(token):
+
+        # update user
+        UserModel.verify_user(token)
+
+        session.commit()
+
+        return UserVerifyOut()
+
+    raise VerificationTokenNotFoundException()
