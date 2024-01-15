@@ -36,6 +36,9 @@ def test_save_new_user_success(app_client: TestClient, db_session: Session):
     assert user_model.name == test_user_name
     assert user_model.email == test_user_email
     assert user_model.password != test_user_password
+    assert user_model.role == "user"
+    assert user_model.is_verified is False
+    assert user_model.verification_token is not None
 
 
 def test_save_new_user_duplicate_email(app_client: TestClient, db_session: Session):

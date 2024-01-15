@@ -1,9 +1,10 @@
 import re
+import secrets
 from datetime import datetime
 from typing import Optional
 
 import bcrypt
-from sqlalchemy import Column, Integer, String, select
+from sqlalchemy import Boolean, Column, Integer, String, select
 
 from app.exceptions.exceptions import DuplicateUserException, InvalidUserEmailFormatException, UserNotFoundException
 from app.models.setting import BaseModel, Engine, session
@@ -34,12 +35,16 @@ class UserModel(BaseModel):
     email = Column(String(256), nullable=False, unique=True)
     password = Column(String(256), nullable=False)
     role = Column(String(256), nullable=False)
+    is_verified = Column(Boolean, nullable=False, default=False)
+    verification_token = Column(String(256), nullable=False)
 
     def __init__(self,
                  name: str,
                  email: str,
                  password: str,
                  role: str = "user",
+                 is_verified: bool = False,
+                 verification_token: str = secrets.token_urlsafe(16),
                  created_at: Optional[datetime] = None,
                  updated_at: Optional[datetime] = None) -> None:
 
@@ -48,6 +53,8 @@ class UserModel(BaseModel):
         self.name = name
         self.email = self._validate_email(email)
         self.role = role
+        self.is_verified = is_verified
+        self.verification_token = verification_token
         self.created_at = created_at
         self.updated_at = updated_at
 

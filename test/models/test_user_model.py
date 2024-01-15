@@ -18,6 +18,7 @@ class TestUserModel():
         test_password = 'test_password'
         test_user_name = 'test_user_name'
         test_user_email = 'user_email_1@sample.com'
+        test_user_is_verified = False
 
         # Execute
         user_model = UserModel(name=test_user_name,
@@ -29,6 +30,8 @@ class TestUserModel():
         assert user_model.email == test_user_email
         assert len(user_model.password) == 60
         assert user_model.role == 'user'
+        assert user_model.is_verified == test_user_is_verified
+        assert user_model.verification_token is not None
         assert user_model.created_at is None
         assert user_model.updated_at is None
 
