@@ -44,3 +44,16 @@ class UserGetMeOut(BaseModel):
             }
         }
     )
+
+
+class UserVerifyOut(BaseModel):
+
+    message: str = Field(title='message', min_length=1, max_length=255, default='user verified successfully')
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'message': 'user verified successfully'
+            }
+        }
+    )
