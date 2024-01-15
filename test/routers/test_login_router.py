@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.models.factories import UserModelFactory
 from app.routers.setting import AppRoutes
 from app.schemas.exceptions import InvalidUserPasswordExceptionOut, UserNotFoundExceptionOut
+from app.schemas.requests import UserLoginIn
 from app.schemas.responses import UserLoginOut
 
 TEST_URL = f"{AppRoutes.Login.PREFIX}"
@@ -18,11 +19,11 @@ def test_login_success(app_client: TestClient, db_session: Session):
     test_user_password = "password"
     test_user_model = UserModelFactory(password=test_user_password)
     db_session.commit()
+    user_login_in = UserLoginIn(email=test_user_model.email, password=test_user_password)
 
     # Execute
     response = app_client.post(f"{TEST_URL}{AppRoutes.Login.POST_TOKEN_URL}",
-                               data={"username": test_user_model.email,
-                                     "password": test_user_password})
+                               json=user_login_in.model_dump())
 
     # Assert
     assert response.status_code == status.HTTP_200_OK
@@ -39,11 +40,11 @@ def test_login_invalid_password(app_client: TestClient, db_session: Session):
     test_user_password = "password"
     test_user_model = UserModelFactory(password=test_user_password)
     db_session.commit()
+    user_login_in = UserLoginIn(email=test_user_model.email, password="invalid_password")
 
     # Execute
     response = app_client.post(f"{TEST_URL}{AppRoutes.Login.POST_TOKEN_URL}",
-                               data={"username": test_user_model.email,
-                                     "password": "invalid_password"})
+                               json=user_login_in.model_dump())
 
     # Assert
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -55,11 +56,11 @@ def test_login_user_not_found(app_client: TestClient):
     Test login with user not found
     """
     # Prepare
+    user_login_in = UserLoginIn(email="invalid_user", password="password")
 
     # Execute
     response = app_client.post(f"{TEST_URL}{AppRoutes.Login.POST_TOKEN_URL}",
-                               data={"username": "invalid_user",
-                                     "password": "password"})
+                               json=user_login_in.model_dump())
 
     # Assert
     assert response.status_code == status.HTTP_404_NOT_FOUND

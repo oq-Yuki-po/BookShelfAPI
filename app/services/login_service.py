@@ -1,15 +1,18 @@
 import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import List
 
 from fastapi import Depends
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 
-from app.exceptions.exceptions import InvalidCredentialsException
-from app.routers.setting import oauth2_scheme
+from app.exceptions.exceptions import InvalidCredentialsException, NotEnoughPermissionsException
 
 SECRET_KEY = os.environ.get("TOKEN_SECRET")
 ALGORITHM = os.environ.get("TOKEN_ALGORITHM")
+
+http_bearer = HTTPBearer()
 
 
 @dataclass
@@ -53,7 +56,8 @@ class LoginService:
         return encoded_jwt
 
     @classmethod
-    def verify_token(cls, token: str = Depends(oauth2_scheme)) -> TokenData:
+    def verify_token(cls,
+                     token: HTTPAuthorizationCredentials = Depends(http_bearer)) -> TokenData:
         """Verify token
 
         Parameters
@@ -72,10 +76,37 @@ class LoginService:
             if token is invalid
         """
         try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            payload = jwt.decode(token.credentials, SECRET_KEY, algorithms=[ALGORITHM])
             user_name: str = payload.get("sub")
             if user_name is None:
                 raise InvalidCredentialsException()
             return TokenData(user_name=user_name, role=payload.get("role"))
         except JWTError as e:
             raise InvalidCredentialsException() from e
+
+    @classmethod
+    def verify_permission(cls,
+                          required_permissions: List[str],
+                          token: TokenData) -> TokenData:
+        """Verify permission
+
+        Parameters
+        ----------
+        required_permissions : List[str]
+            required permissions
+        token : TokenData
+            token data
+
+        Returns
+        -------
+        TokenData
+            token data
+
+        Raises
+        ------
+        NotEnoughPermissionsException
+            if user does not have enough permissions
+        """
+        if token.role not in required_permissions:
+            raise NotEnoughPermissionsException()
+        return TokenData(user_name=token.user_name, role=token.role)

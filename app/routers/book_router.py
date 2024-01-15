@@ -20,7 +20,7 @@ router = APIRouter(
     tags=[AppRoutes.Books.TAG]
 )
 BOOK_ROUTERS = AppRoutes.Books
-BOOK_ROUTER_PERMISSIONS = AppRoutePermissions.Books
+ROUTER_PERMISSIONS = AppRoutePermissions.Books
 
 
 @router.post(BOOK_ROUTERS.POST_GOOGLE_BOOKS_URL,
@@ -37,7 +37,8 @@ BOOK_ROUTER_PERMISSIONS = AppRoutePermissions.Books
              },
              status_code=200)
 async def save_google_books(books_google_books_api_save_in: BooksGoogleBooksApiSaveIn,
-                            current_user: TokenData = Depends(LoginService.verify_token)) -> GoogleBooksApiSaveOut:
+                            current_user: TokenData = Depends(LoginService.verify_token))\
+        -> GoogleBooksApiSaveOut:
     """
     Save book from Google Books API
 
@@ -66,10 +67,9 @@ async def save_google_books(books_google_books_api_save_in: BooksGoogleBooksApiS
         if google books api error occurred
     ```
     """
-
-    # check user permissions
-    if current_user.role not in BOOK_ROUTER_PERMISSIONS.PostGoogleBooks.PERMISSIONS:
-        raise NotEnoughPermissionsException()
+    # check permissions
+    LoginService.verify_permission(required_permissions=ROUTER_PERMISSIONS.POST_GOOGLE_BOOKS,
+                                   token=current_user)
 
     # fetch book data from google books api
     book_data = GoogleBooksApiService.fetch_book_data(isbn=books_google_books_api_save_in.isbn)
@@ -96,8 +96,7 @@ async def save_google_books(books_google_books_api_save_in: BooksGoogleBooksApiS
 
     session.commit()
 
-    return GoogleBooksApiSaveOut(message='book saved successfully',
-                                 title=book_data.title,
+    return GoogleBooksApiSaveOut(title=book_data.title,
                                  authors=book_data.authors,
                                  published_at=book_data.published_at,
                                  cover_image_base64=ImageBase64Service.encode(image_path=cover_image_path))

@@ -8,12 +8,13 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import AuthorModel, BookAuthorModel, BookModel
-from app.routers.setting import AppRoutes
+from app.routers.setting import AppRoutePermissions, AppRoutes
 from app.schemas.api import GoogleBookSchema
 from app.schemas.requests import BooksGoogleBooksApiSaveIn
 from app.schemas.responses import GoogleBooksApiSaveOut
 
 TEST_URL = f"{AppRoutes.Books.PREFIX}"
+TEST_PERMISSIONS = AppRoutePermissions.Books
 
 
 def test_save_google_books_success(app_client: TestClient,
@@ -40,13 +41,6 @@ def test_save_google_books_success(app_client: TestClient,
                                    json=books_google_books_api_save_in.model_dump())
 
     # Assert
-    stmt = select(BookModel).where(BookModel.isbn == test_isbn)
-    book_model: BookModel = db_session.execute(stmt).scalars().first()
-    stmt = select(AuthorModel).where(AuthorModel.name.in_(["test_author 1", "test_author 2"]))
-    author_models: List[AuthorModel] = db_session.execute(stmt).scalars().all()
-    stmt = select(BookAuthorModel).where(BookAuthorModel.book_id == book_model.id)
-    book_author_models: List[BookAuthorModel] = db_session.execute(stmt).scalars().all()
-
     # Check response
     assert response.status_code == status.HTTP_200_OK
     encoded_cover_image = encode_image_base64(f"app/static/images/{test_isbn}.jpg")
@@ -55,7 +49,15 @@ def test_save_google_books_success(app_client: TestClient,
                                                     authors=["test_author 1", "test_author 2"],
                                                     published_at="2021-01-01",
                                                     cover_image_base64=encoded_cover_image).model_dump()
+
     # Check database
+    stmt = select(BookModel).where(BookModel.isbn == test_isbn)
+    book_model: BookModel = db_session.execute(stmt).scalars().first()
+    stmt = select(AuthorModel).where(AuthorModel.name.in_(["test_author 1", "test_author 2"]))
+    author_models: List[AuthorModel] = db_session.execute(stmt).scalars().all()
+    stmt = select(BookAuthorModel).where(BookAuthorModel.book_id == book_model.id)
+    book_author_models: List[BookAuthorModel] = db_session.execute(stmt).scalars().all()
+
     assert book_model.title == "test_title"
     assert book_model.isbn == test_isbn
     assert book_model.published_at == datetime.date(2021, 1, 1)
