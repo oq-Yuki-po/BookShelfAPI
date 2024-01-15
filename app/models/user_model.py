@@ -182,6 +182,22 @@ class UserModel(BaseModel):
             raise UserNotFoundException()
         return user
 
+    @classmethod
+    def exist_verification_token(cls, token) -> bool:
+        stmt = select(UserModel).where(UserModel.verification_token == token)
+        user = session.execute(stmt).scalars().one_or_none()
+        if user is None:
+            return False
+        return True
+
+    @classmethod
+    def verify_user(cls, token) -> None:
+        stmt = select(UserModel).where(UserModel.verification_token == token)
+        user = session.execute(stmt).scalars().one_or_none()
+        if user is None:
+            raise UserNotFoundException()
+        user.is_verified = True
+
 
 if __name__ == "__main__":
     BaseModel.metadata.create_all(bind=Engine)

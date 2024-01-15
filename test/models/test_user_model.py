@@ -268,3 +268,49 @@ class TestUserModel():
         # Assert
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
         assert exc_info.value.message == ExceptionMessage.USER_NOT_FOUND
+
+    def test_exist_verification_token_exist(self, db_session):
+        """Test exist_verification_token method of UserModel
+        check if verification token exist
+        """
+        # Prepare
+        test_user_model = UserModelFactory()
+        db_session.commit()
+
+        # Execute
+        exist = UserModel.exist_verification_token(test_user_model.verification_token)
+
+        # Assert
+        assert exist is True
+
+    def test_exist_verification_token_not_exist(self):
+        """Test exist_verification_token method of UserModel
+        check if verification token not exist
+        """
+        # Prepare
+        test_verification_token = 'test_verification_token'
+
+        # Execute
+        exist = UserModel.exist_verification_token(test_verification_token)
+
+        # Assert
+        assert exist is False
+
+    def test_verify_user(self, db_session):
+        """Test verify_user method of UserModel
+        check if user is verified
+        """
+        # Prepare
+        test_user_model = UserModelFactory(is_verified=False)
+        db_session.commit()
+
+        # Execute
+        UserModel.verify_user(test_user_model.verification_token)
+        db_session.commit()
+
+        # Assert
+        stmt = select(UserModel).where(UserModel.id == test_user_model.id,
+                                       UserModel.is_verified == True)
+        result = db_session.execute(stmt).scalars().one_or_none()
+        assert result is not None
+        assert result.is_verified is True
