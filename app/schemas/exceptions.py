@@ -151,3 +151,18 @@ class UserIsNotVerifiedExceptionOut(BaseModel):
             }
         }
     )
+
+
+class VerificationTokenNotFoundExceptionOut(BaseModel):
+
+    detail: str = Field(
+        description='The detail of the exception',
+        default=ExceptionMessage.VERIFICATION_TOKEN_NOT_FOUND
+    )
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'detail': ExceptionMessage.VERIFICATION_TOKEN_NOT_FOUND
+            }
+        }
+    )

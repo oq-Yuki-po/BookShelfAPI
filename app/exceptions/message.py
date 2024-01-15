@@ -15,3 +15,4 @@ class ExceptionMessage():
     BOOK_ISBN_FORMAT = 'ISBN must be numeric'
     DUPLICATE_BOOK_ISBN = 'Book already exists'
     USER_IS_NOT_VERIFIED = 'User is not verified'
+    VERIFICATION_TOKEN_NOT_FOUND = 'Verification token not found'

@@ -111,3 +111,14 @@ class UserIsNotVerifiedException(HTTPException):
         self.status_code = status_code
         self.message = message
         super().__init__(status_code=self.status_code, detail=self.message)
+
+
+class VerificationTokenNotFoundException(HTTPException):
+    """Exception for Verification Token Not Found"""
+
+    def __init__(self,
+                 status_code: int = status.HTTP_404_NOT_FOUND,
+                 message: str = ExceptionMessage.VERIFICATION_TOKEN_NOT_FOUND):
+        self.status_code = status_code
+        self.message = message
+        super().__init__(status_code=self.status_code, detail=self.message)
