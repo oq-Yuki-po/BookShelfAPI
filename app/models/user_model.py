@@ -174,7 +174,8 @@ class UserModel(BaseModel):
         stmt = select(UserModel.id,
                       UserModel.name,
                       UserModel.email,
-                      UserModel.role
+                      UserModel.role,
+                      UserModel.is_verified,
                       ).where(UserModel.email == email)
         user = session.execute(stmt).one_or_none()
         if user is None:

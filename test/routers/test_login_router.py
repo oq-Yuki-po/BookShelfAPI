@@ -4,7 +4,11 @@ from sqlalchemy.orm import Session
 
 from app.models.factories import UserModelFactory
 from app.routers.setting import AppRoutes
-from app.schemas.exceptions import InvalidUserPasswordExceptionOut, UserNotFoundExceptionOut
+from app.schemas.exceptions import (
+    InvalidUserPasswordExceptionOut,
+    UserIsNotVerifiedExceptionOut,
+    UserNotFoundExceptionOut,
+)
 from app.schemas.requests import UserLoginIn
 from app.schemas.responses import UserLoginOut
 
@@ -17,7 +21,9 @@ def test_login_success(app_client: TestClient, db_session: Session):
     """
     # Prepare
     test_user_password = "password"
-    test_user_model = UserModelFactory(password=test_user_password)
+    # create user with verified
+    test_user_model = UserModelFactory(password=test_user_password,
+                                       is_verified=True)
     db_session.commit()
     user_login_in = UserLoginIn(email=test_user_model.email, password=test_user_password)
 
@@ -30,6 +36,27 @@ def test_login_success(app_client: TestClient, db_session: Session):
     assert response.json() == UserLoginOut(access_token=response.json()["access_token"],
                                            type=response.json()["type"],
                                            user=test_user_model.role).model_dump()
+
+
+def test_login_user_not_verified(app_client: TestClient, db_session: Session):
+    """
+    Test login with user not verified
+    """
+    # Prepare
+    test_user_password = "password"
+    # create user with not verified
+    test_user_model = UserModelFactory(password=test_user_password,
+                                       is_verified=False)
+    db_session.commit()
+    user_login_in = UserLoginIn(email=test_user_model.email, password=test_user_password)
+
+    # Execute
+    response = app_client.post(f"{TEST_URL}{AppRoutes.Login.POST_TOKEN_URL}",
+                               json=user_login_in.model_dump())
+
+    # Assert
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.json() == UserIsNotVerifiedExceptionOut().model_dump()
 
 
 def test_login_invalid_password(app_client: TestClient, db_session: Session):
