@@ -136,3 +136,18 @@ class GoogleBooksApiExceptionOut(BaseModel):
             }
         }
     )
+
+
+class UserIsNotVerifiedExceptionOut(BaseModel):
+
+    detail: str = Field(
+        description='The detail of the exception',
+        default=ExceptionMessage.USER_IS_NOT_VERIFIED
+    )
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'detail': ExceptionMessage.USER_IS_NOT_VERIFIED
+            }
+        }
+    )

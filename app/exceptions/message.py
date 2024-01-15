@@ -14,3 +14,4 @@ class ExceptionMessage():
     BOOK_ISBN_DIGITS = 'ISBN must be 10 or 13 digits'
     BOOK_ISBN_FORMAT = 'ISBN must be numeric'
     DUPLICATE_BOOK_ISBN = 'Book already exists'
+    USER_IS_NOT_VERIFIED = 'User is not verified'

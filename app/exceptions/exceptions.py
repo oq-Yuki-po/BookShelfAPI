@@ -100,3 +100,14 @@ class DuplicateBookIsbnException(HTTPException):
         self.status_code = status_code
         self.message = message
         super().__init__(status_code=self.status_code, detail=self.message)
+
+
+class UserIsNotVerifiedException(HTTPException):
+    """Exception for User Is Not Verified"""
+
+    def __init__(self,
+                 status_code: int = status.HTTP_403_FORBIDDEN,
+                 message: str = ExceptionMessage.USER_IS_NOT_VERIFIED):
+        self.status_code = status_code
+        self.message = message
+        super().__init__(status_code=self.status_code, detail=self.message)
