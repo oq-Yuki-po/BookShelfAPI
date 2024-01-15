@@ -309,8 +309,23 @@ class TestUserModel():
         db_session.commit()
 
         # Assert
-        stmt = select(UserModel).where(UserModel.id == test_user_model.id,
-                                       UserModel.is_verified == True)
+        stmt = select(UserModel).where(UserModel.id == test_user_model.id)
         result = db_session.execute(stmt).scalars().one_or_none()
         assert result is not None
         assert result.is_verified is True
+        assert result.verification_token is None
+
+    def test_verify_user_user_not_found(self):
+        """Test verify_user method of UserModel
+        check if user is not found
+        """
+        # Prepare
+        test_verification_token = 'test_verification_token'
+
+        # Execute
+        with pytest.raises(UserNotFoundException) as exc_info:
+            UserModel.verify_user(test_verification_token)
+
+        # Assert
+        assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
+        assert exc_info.value.message == ExceptionMessage.USER_NOT_FOUND

@@ -36,7 +36,7 @@ class UserModel(BaseModel):
     password = Column(String(256), nullable=False)
     role = Column(String(256), nullable=False)
     is_verified = Column(Boolean, nullable=False, default=False)
-    verification_token = Column(String(256), nullable=False)
+    verification_token = Column(String(256), nullable=True)
 
     def __init__(self,
                  name: str,
@@ -197,6 +197,7 @@ class UserModel(BaseModel):
         if user is None:
             raise UserNotFoundException()
         user.is_verified = True
+        user.verification_token = None
 
 
 if __name__ == "__main__":
