@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends
 
-from app.exceptions.exceptions import NotEnoughPermissionsException
 from app.models import AuthorModel, BookAuthorModel, BookModel, session
 from app.routers.setting import AppRoutePermissions, AppRoutes
 from app.schemas.exceptions import (
