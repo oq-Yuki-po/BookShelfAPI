@@ -57,7 +57,7 @@ async def login(user_login_in: UserLoginIn) -> UserLoginOut:
     ```
     """
     # fetch user
-    user = UserModel.fetch_user_by_email(user_login_in.email)
+    user: UserModel = UserModel.fetch_user_by_email(user_login_in.email)
 
     # check if user is verified
     if not user.is_verified:
@@ -71,4 +71,4 @@ async def login(user_login_in: UserLoginIn) -> UserLoginOut:
 
     # generate token
     access_token = LoginService.create_access_token(data={"sub": user.name, "role": user.role})
-    return UserLoginOut(access_token=access_token, type="bearer", role=user.role)
+    return UserLoginOut(access_token=access_token, type="bearer", role=user.role, user_name=user.name)

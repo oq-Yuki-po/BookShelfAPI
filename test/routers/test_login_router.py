@@ -35,7 +35,9 @@ def test_login_success(app_client: TestClient, db_session: Session):
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == UserLoginOut(access_token=response.json()["access_token"],
                                            type=response.json()["type"],
-                                           user=test_user_model.role).model_dump()
+                                           role=test_user_model.role,
+                                           user_name=test_user_model.name
+                                           ).model_dump()
 
 
 def test_login_user_not_verified(app_client: TestClient, db_session: Session):

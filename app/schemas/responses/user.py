@@ -19,13 +19,15 @@ class UserLoginOut(BaseModel):
     access_token: str = Field(title='token', min_length=1, max_length=255)
     type: str = Field(title='type', min_length=1, max_length=255, default='bearer')
     role: str = Field(title='role', min_length=1, max_length=255, default='user')
+    user_name: str = Field(title='user name', min_length=1, max_length=255)
 
     model_config = ConfigDict(
         json_schema_extra={
             'example': {
                 'access_token': 'token',
                 'type': 'bearer',
-                'role': 'user'
+                'role': 'user',
+                'user_name': 'user name'
             }
         }
     )
