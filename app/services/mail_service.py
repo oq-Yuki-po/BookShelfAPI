@@ -22,7 +22,6 @@ class MailService:
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         try:
-            print(sender_email, password)
             server.login(sender_email, password)
             server.send_message(msg)
         except smtplib.SMTPAuthenticationError:
