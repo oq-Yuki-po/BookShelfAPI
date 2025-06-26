@@ -17,12 +17,3 @@ class AppRoutes:
         PREFIX: str = "/books"
         POST_URL: str = "/"
         POST_GOOGLE_BOOKS_URL: str = "/google-books"
-
-
-class AppRoutePermissions:
-    class Users:
-
-        GET_ME = ["admin", "user"]
-
-    class Books:
-        POST_GOOGLE_BOOKS = ["admin"]

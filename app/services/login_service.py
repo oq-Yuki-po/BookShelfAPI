@@ -83,30 +83,3 @@ class LoginService:
             return TokenData(user_name=user_name, role=payload.get("role"))
         except JWTError as e:
             raise InvalidCredentialsException() from e
-
-    @classmethod
-    def verify_permission(cls,
-                          required_permissions: List[str],
-                          token: TokenData) -> TokenData:
-        """Verify permission
-
-        Parameters
-        ----------
-        required_permissions : List[str]
-            required permissions
-        token : TokenData
-            token data
-
-        Returns
-        -------
-        TokenData
-            token data
-
-        Raises
-        ------
-        NotEnoughPermissionsException
-            if user does not have enough permissions
-        """
-        if token.role not in required_permissions:
-            raise NotEnoughPermissionsException()
-        return TokenData(user_name=token.user_name, role=token.role)

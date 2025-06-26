@@ -8,7 +8,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import AuthorModel, BookAuthorModel, BookModel
-from app.routers.setting import AppRoutePermissions, AppRoutes
+from app.routers.setting import AppRoutes
+from app.core.security import AppRoutePermissions
 from app.schemas.api import GoogleBookSchema
 from app.schemas.requests import BooksGoogleBooksApiSaveIn
 from app.schemas.responses import GoogleBooksApiSaveOut

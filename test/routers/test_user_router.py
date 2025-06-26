@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+
 from app.models import UserModel
 from app.models.factories import UserModelFactory
 from app.routers.setting import AppRoutes
@@ -10,9 +11,10 @@ from app.schemas.exceptions import (
     DuplicateUserExceptionOut,
     InvalidUserEmailFormatExceptionOut,
     VerificationTokenNotFoundExceptionOut,
+    NotEnoughPermissionsExceptionOut,
 )
 from app.schemas.requests import UserSaveIn
-from app.schemas.responses import UserSaveOut, UserVerifyOut
+from app.schemas.responses import UserSaveOut, UserVerifyOut, UserGetMeOut
 
 TEST_URL = f"{AppRoutes.Users.PREFIX}"
 
@@ -131,3 +133,43 @@ def test_verify_user_invalid_token(app_client: TestClient, db_session: Session):
     user_model = db_session.execute(stmt).scalars().one_or_none()
     assert user_model.is_verified is False
     assert user_model.verification_token is not None
+
+
+def test_get_current_user_success(app_client: TestClient, override_verify_token_dependency):
+    """
+    Test get current user with correct role
+    """
+    # Prepare
+    with override_verify_token_dependency("user"):
+        # Execute
+        response = app_client.get(f"{TEST_URL}{AppRoutes.Users.GET_ME_URL}")
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == UserGetMeOut(user_name="test_user", role="user").model_dump()
+
+
+def test_get_current_user_forbidden(app_client: TestClient, override_verify_token_dependency):
+    """
+    Test get current user with incorrect role
+    """
+    # Prepare
+    with override_verify_token_dependency("guest"):
+        # Execute
+        response = app_client.get(f"{TEST_URL}{AppRoutes.Users.GET_ME_URL}")
+
+        # Assert
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.json() == NotEnoughPermissionsExceptionOut().model_dump()
+
+
+def test_get_current_user_unauthorized(app_client: TestClient):
+    """
+    Test get current user without token
+    """
+    # Execute
+    response = app_client.get(f"{TEST_URL}{AppRoutes.Users.GET_ME_URL}")
+
+    # Assert
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.json() == {"detail": "Not authenticated"}

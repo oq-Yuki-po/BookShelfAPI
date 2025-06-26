@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends
 
 from app.models import AuthorModel, BookAuthorModel, BookModel, session
-from app.routers.setting import AppRoutePermissions, AppRoutes
+from app.routers.setting import AppRoutes
+from app.core.security import AppRoutePermissions
 from app.schemas.exceptions import (
     BookIsbnInvalidFormatExceptionOut,
     DuplicateBookISBNExceptionOut,
@@ -13,6 +14,7 @@ from app.schemas.responses import GoogleBooksApiSaveOut
 from app.services.google_books_api_service import GoogleBooksApiService
 from app.services.image_service import ImageBase64Service
 from app.services.login_service import LoginService, TokenData
+from app.dependencies import has_permission
 
 router = APIRouter(
     prefix=AppRoutes.Books.PREFIX,
@@ -36,7 +38,7 @@ ROUTER_PERMISSIONS = AppRoutePermissions.Books
              },
              status_code=200)
 async def save_google_books(books_google_books_api_save_in: BooksGoogleBooksApiSaveIn,
-                            current_user: TokenData = Depends(LoginService.verify_token))\
+                            current_user: TokenData = Depends(has_permission(ROUTER_PERMISSIONS.POST_GOOGLE_BOOKS)))\
         -> GoogleBooksApiSaveOut:
     """
     Save book from Google Books API
@@ -66,9 +68,6 @@ async def save_google_books(books_google_books_api_save_in: BooksGoogleBooksApiS
         if google books api error occurred
     ```
     """
-    # check permissions
-    LoginService.verify_permission(required_permissions=ROUTER_PERMISSIONS.POST_GOOGLE_BOOKS,
-                                   token=current_user)
 
     # fetch book data from google books api
     book_data = GoogleBooksApiService.fetch_book_data(isbn=books_google_books_api_save_in.isbn)

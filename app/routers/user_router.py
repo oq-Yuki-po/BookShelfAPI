@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, status
 
 from app import handle_errors
-from app.exceptions.exceptions import NotEnoughPermissionsException, VerificationTokenNotFoundException
+from app.exceptions.exceptions import VerificationTokenNotFoundException
 from app.models import UserModel, session
-from app.routers.setting import AppRoutePermissions, AppRoutes
+from app.routers.setting import AppRoutes
+from app.core.security import AppRoutePermissions
 from app.schemas.exceptions import (
     DuplicateUserExceptionOut,
     InvalidUserEmailFormatExceptionOut,
@@ -12,8 +13,8 @@ from app.schemas.exceptions import (
 )
 from app.schemas.requests import UserSaveIn
 from app.schemas.responses import UserGetMeOut, UserSaveOut, UserVerifyOut
-from app.services.login_service import LoginService
 from app.services.mail_service import MailService
+from app.dependencies import has_permission
 
 router = APIRouter(
     prefix=AppRoutes.Users.PREFIX,
@@ -87,7 +88,7 @@ async def save_new_user(user_save_in: UserSaveIn) -> UserSaveOut:
             },
             status_code=status.HTTP_200_OK)
 @handle_errors
-async def get_current_user(current_user: str = Depends(LoginService.verify_token)) -> UserGetMeOut:
+async def get_current_user(current_user: str = Depends(has_permission(AppRoutePermissions.Users.GET_ME))) -> UserGetMeOut:
     """
     Get current user
 
@@ -108,8 +109,6 @@ async def get_current_user(current_user: str = Depends(LoginService.verify_token
         if user role is not admin or user
     ```
     """
-    if current_user.role not in USER_ROUTER_PERMISSIONS.GetMe.PERMISSIONS:
-        raise NotEnoughPermissionsException()
     return UserGetMeOut(user_name=current_user.user_name, role=current_user.role)
 
 
