@@ -5,10 +5,6 @@
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspace",
-	"features": {
-		"ghcr.io/devcontainers-contrib/features/isort:2": {},
-		"ghcr.io/devcontainers-contrib/features/pylint:2": {}
-	},
 	"customizations": {
 		"vscode": {
 			"settings": {
@@ -83,5 +79,8 @@
 		]
 	},
 	"postCreateCommand": "bash .devcontainer/post-create.sh",
-	"remoteUser": "vscode"
+	"remoteUser": "vscode",
+	"features": {
+		"ghcr.io/devcontainers-extra/features/node-asdf:0": {}
+	}
 }
