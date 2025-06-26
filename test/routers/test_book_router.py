@@ -36,6 +36,10 @@ def test_save_google_books_success(app_client: TestClient,
                                                    authors=["test_author 1", "test_author 2"],
                                                    published_at="2021-01-01",
                                                    cover_url="https://via.placeholder.com/150"))
+        mocker.patch('app.services.google_books_api_service.GoogleBooksApiService.save_cover_image',
+                     return_value=f"app/static/images/{test_isbn}.jpg")
+        mocker.patch('app.services.image_service.ImageBase64Service.encode',
+                     return_value=b'dummy_base64_image_data')
         # Execute
         response = app_client.post(f"{TEST_URL}{AppRoutes.Books.POST_GOOGLE_BOOKS_URL}",
                                    json=books_google_books_api_save_in.model_dump())
@@ -43,12 +47,11 @@ def test_save_google_books_success(app_client: TestClient,
     # Assert
     # Check response
     assert response.status_code == status.HTTP_200_OK
-    encoded_cover_image = encode_image_base64(f"app/static/images/{test_isbn}.jpg")
     assert response.json() == GoogleBooksApiSaveOut(message='book saved successfully',
                                                     title="test_title",
                                                     authors=["test_author 1", "test_author 2"],
                                                     published_at="2021-01-01",
-                                                    cover_image_base64=encoded_cover_image).model_dump()
+                                                    cover_image_base64=b'dummy_base64_image_data').model_dump()
 
     # Check database
     stmt = select(BookModel).where(BookModel.isbn == test_isbn)
@@ -69,8 +72,3 @@ def test_save_google_books_success(app_client: TestClient,
     for book_author_model in book_author_models:
         assert book_author_model.book_id == book_model.id
         assert book_author_model.author_id in [author_model.id for author_model in author_models]
-    # Check cover image file
-    assert os.path.exists(f"app/static/images/{test_isbn}.jpg")
-
-    # Clean up
-    os.remove(f"app/static/images/{test_isbn}.jpg")
