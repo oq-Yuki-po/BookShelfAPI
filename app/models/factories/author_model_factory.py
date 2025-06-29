@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from factory import Sequence
 from factory.alchemy import SQLAlchemyModelFactory
+from factory.declarations import Sequence
 
 from app.models import AuthorModel, session
 
