@@ -6,6 +6,7 @@ from typing import Optional
 import bcrypt
 from sqlalchemy import Boolean, Column, Integer, String, select
 
+from app.core.security import AppRoles
 from app.exceptions.exceptions import DuplicateUserException, InvalidUserEmailFormatException, UserNotFoundException
 from app.models.setting import BaseModel, Engine, session
 
@@ -42,7 +43,7 @@ class UserModel(BaseModel):
                  name: str,
                  email: str,
                  password: str,
-                 role: str = "user",
+                 role: str = AppRoles.USER,
                  is_verified: bool = False,
                  verification_token: str = secrets.token_urlsafe(16),
                  created_at: Optional[datetime] = None,
@@ -114,7 +115,7 @@ class UserModel(BaseModel):
             user email
         password : str
             user password
-        role : str (optional) (default="user")
+        role : str (optional) (default= AppRoles.USER)
             user role
 
         Raises

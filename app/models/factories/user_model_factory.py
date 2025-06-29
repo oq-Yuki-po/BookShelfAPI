@@ -3,6 +3,7 @@ from datetime import datetime
 from factory import Sequence
 from factory.alchemy import SQLAlchemyModelFactory
 
+from app.core.security import AppRoles
 from app.models import UserModel, session
 
 
@@ -15,7 +16,7 @@ class UserModelFactory(SQLAlchemyModelFactory):
     name = Sequence(lambda n: f'user_name_{n}')
     email = Sequence(lambda n: f'user_email_{n}@sample.com')
     password = Sequence(lambda n: f'user_password_{n}')
-    role = "user"
+    role = AppRoles.USER  # Default role is 'user', can be overridden if needed
     is_verified = True
     verification_token = Sequence(lambda n: f'user_verification_token_{n}')
     created_at = datetime.now()

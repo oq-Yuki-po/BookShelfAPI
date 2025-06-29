@@ -1,6 +1,7 @@
 import pytest
 from fastapi.security import HTTPAuthorizationCredentials
 
+from app.core.security import AppRoles
 from app.exceptions.exceptions import InvalidCredentialsException
 from app.services.login_service import LoginService, TokenData
 
@@ -13,7 +14,7 @@ class TestLoginService():
         """
         # Prepare
         test_user_name = "test_user_name"
-        test_role = "user"
+        test_role = AppRoles.USER
         test_data = {"sub": test_user_name, "role": test_role}
 
         # Execute
@@ -28,7 +29,7 @@ class TestLoginService():
         """
         # Prepare
         test_user_name = "test_user_name"
-        test_role = "user"
+        test_role = AppRoles.USER
         test_data = {"sub": test_user_name, "role": test_role}
         test_access_token = LoginService.create_access_token(test_data)
         test_token = HTTPAuthorizationCredentials(scheme="Bearer", credentials=test_access_token)

@@ -3,18 +3,18 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-
+from app.core.security import AppRoles
 from app.models import UserModel
 from app.models.factories import UserModelFactory
 from app.routers.setting import AppRoutes
 from app.schemas.exceptions import (
     DuplicateUserExceptionOut,
     InvalidUserEmailFormatExceptionOut,
-    VerificationTokenNotFoundExceptionOut,
     NotEnoughPermissionsExceptionOut,
+    VerificationTokenNotFoundExceptionOut,
 )
 from app.schemas.requests import UserSaveIn
-from app.schemas.responses import UserSaveOut, UserVerifyOut, UserGetMeOut
+from app.schemas.responses import UserGetMeOut, UserSaveOut, UserVerifyOut
 
 TEST_URL = f"{AppRoutes.Users.PREFIX}"
 
@@ -43,7 +43,7 @@ def test_save_new_user_success(app_client: TestClient, db_session: Session, mock
     assert user_model.name == test_user_name
     assert user_model.email == test_user_email
     assert user_model.password != test_user_password
-    assert user_model.role == "user"
+    assert user_model.role == AppRoles.USER
     assert user_model.is_verified is False
     assert user_model.verification_token is not None
 
@@ -140,13 +140,13 @@ def test_get_current_user_success(app_client: TestClient, override_verify_token_
     Test get current user with correct role
     """
     # Prepare
-    with override_verify_token_dependency("user"):
+    with override_verify_token_dependency(AppRoles.USER):
         # Execute
         response = app_client.get(f"{TEST_URL}{AppRoutes.Users.GET_ME_URL}")
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == UserGetMeOut(user_name="test_user", role="user").model_dump()
+        assert response.json() == UserGetMeOut(user_name="test_user", role=AppRoles.USER).model_dump()
 
 
 def test_get_current_user_forbidden(app_client: TestClient, override_verify_token_dependency):
@@ -154,7 +154,7 @@ def test_get_current_user_forbidden(app_client: TestClient, override_verify_toke
     Test get current user with incorrect role
     """
     # Prepare
-    with override_verify_token_dependency("guest"):
+    with override_verify_token_dependency(AppRoles.GUEST):
         # Execute
         response = app_client.get(f"{TEST_URL}{AppRoutes.Users.GET_ME_URL}")
 

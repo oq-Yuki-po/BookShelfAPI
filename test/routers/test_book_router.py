@@ -7,9 +7,9 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.security import AppRoles, AppRoutePermissions
 from app.models import AuthorModel, BookAuthorModel, BookModel
 from app.routers.setting import AppRoutes
-from app.core.security import AppRoutePermissions
 from app.schemas.api import GoogleBookSchema
 from app.schemas.requests import BooksGoogleBooksApiSaveIn
 from app.schemas.responses import GoogleBooksApiSaveOut
@@ -27,7 +27,7 @@ def test_save_google_books_success(app_client: TestClient,
     Test save google books
     """
     # Prepare
-    with override_verify_token_dependency("admin"):
+    with override_verify_token_dependency(AppRoles.ADMIN):
 
         test_isbn = "9784774193684"
         books_google_books_api_save_in = BooksGoogleBooksApiSaveIn(isbn=test_isbn)
